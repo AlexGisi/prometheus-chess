@@ -8,8 +8,15 @@
 #include "Board.h"
 
 Board::Board() {
+    setUpEmpty();
+};
+
+void Board::setUpEmpty() {
     for(int & piece : pieces)
-        piece = EMPTY;
+        piece = OFFBOARD;
+
+    for(int i : sq64ToSq120)
+        pieces[i] = EMPTY;
 
     for(BitBoard & bb : pawns)
         bb = BitBoard();
@@ -43,10 +50,12 @@ Board::Board() {
     }
 
     posKey = PosKey(this);
-};
+}
 
 // TODO
 Board::Board(const Board &rhs) {
+    setUpEmpty();
+
     for(int i=0; i < BRD_SQ_NUM; ++i)
         pieces[i] = rhs.pieces[i];
 
@@ -88,6 +97,8 @@ Board &Board::operator=(const Board &rhs) {
     if(&rhs == this)
         return *this;
 
+    setUpEmpty();
+
     for(int i=0; i < BRD_SQ_NUM; ++i)
         pieces[i] = rhs.pieces[i];
 
@@ -128,6 +139,8 @@ Board &Board::operator=(const Board &rhs) {
 
 // Not robust to incorrect fen strings.
 Board::Board(const std::string& fen) {
+    setUpEmpty();
+
     int rank = RANK_8;
     int file = FILE_A;
     int piece = 0;
@@ -199,6 +212,7 @@ Board::Board(const std::string& fen) {
             case 'Q': castlePerm |= WQCA; break;
             case 'k': castlePerm |= BKCA; break;
             case 'q': castlePerm |= BQCA; break;
+            case '-': break;
             default:
                 std::cout << "Error: read wrong character in castling string: " << c << std::endl; // TODO: throw.
         }
@@ -417,6 +431,91 @@ bool Board::checkBoard() const {
 
     return true;
 }
+
+// Determine if a square is attacked by a side.
+bool Board::sqAttacked(const int sq, const int att_side) const {
+    int pce, idx, t_sq, dir = 0;
+
+    // Pawns.
+    if(att_side == WHITE) {
+        if(pieces[sq-11] == wP || pieces[sq-9] == wP)
+            return true;
+    } else {
+        if(pieces[sq+11] == bP || pieces[sq+9] == bP)
+            return true;
+    }
+
+    // Knights.
+    for(idx = 0; idx < 8; ++idx) {
+        pce = pieces[sq+knDir[idx]];
+        if(pce != OFFBOARD && pce != EMPTY && isKn(pce) && pieceCol[pce]==att_side)
+            return true;
+    }
+
+    // Rooks, queens.
+    for(idx = 0; idx < 4; ++idx) {
+        dir = rkDir[idx];
+        t_sq = sq + dir;
+        pce = pieces[t_sq];
+        while(pce != OFFBOARD) {
+            if(pce != EMPTY) {
+                if(isRQ(pce) && pieceCol[pce]==att_side)
+                    return true;
+                break;
+            }
+            t_sq += dir;
+            pce = pieces[t_sq];
+        }
+    }
+
+    // Bishops, queens.
+    for(idx = 0; idx < 4; ++idx) {
+        dir = biDir[idx];
+        t_sq = sq + dir;
+        pce = pieces[t_sq];
+        while(pce != OFFBOARD) {
+            if(pce != EMPTY) {
+                if(isBQ(pce) && pieceCol[pce]==att_side)
+                    return true;
+                break;
+            }
+            t_sq += dir;
+            pce = pieces[t_sq];
+        }
+    }
+
+    // Kings.
+    for(idx = 0; idx < 8; ++idx) {
+        pce = pieces[sq+kiDir[idx]];
+        if(pce != OFFBOARD && pce != EMPTY && isKi(pce) && pieceCol[pce]==att_side)
+            return true;
+    }
+
+    return false;
+}
+
+// Testing function for sqAttacked.
+void Board::showSqAttBySide(int att_side) const {
+    int rank = 0;
+    int file = 0;
+    int sq = 0;
+
+    printf("\n\nSquares attacked by:%c\n", sideChar[att_side]);
+    for(rank = RANK_8; rank >= RANK_1; --rank) {
+        for(file = FILE_A; file <= FILE_H; ++file) {
+            sq = FR2SQ(file,rank);
+            if(sqAttacked(sq, att_side)) {
+                printf("X");
+            } else {
+                printf("-");
+            }
+
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+}
+
 
 int Board::sq120ToSq64[BRD_SQ_NUM];
 int Board::sq64ToSq120[64];

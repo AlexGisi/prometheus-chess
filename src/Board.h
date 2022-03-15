@@ -18,6 +18,8 @@ public:
     Board(const Board& rhs);
     Board& operator=(const Board& rhs);
 
+    void setUpEmpty();
+
     static int sq120ToSq64[BRD_SQ_NUM];
     static int sq64ToSq120[64];
     static int filesBrd[BRD_SQ_NUM];
@@ -29,6 +31,9 @@ public:
     void reset();
     void updateListsMaterial();
     bool checkBoard() const;
+
+    bool sqAttacked(int sq, int att_side) const;
+    void showSqAttBySide(int side) const;
 
     void print();
 

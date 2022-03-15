@@ -15,7 +15,6 @@
 #define MAX_GAME_MOVES 2048
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-#define FEN1 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
 // Useful for printing the board.
 const char pceChar[] = ".PNBRQKpnbrqk";
@@ -56,9 +55,23 @@ const int pieceVal[13] = { 0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 55
 const int pieceCol[13] = { BOTH, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,
                            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK };
 
+// How pieces can move.
+const int knDir[8] = { -8, -19, -21, -12, 8, 19, 21, 12 };
+const int rkDir[4] = { -1, -10, 1, 10 };
+const int biDir[4] = { -9, -11, 11, 9 };
+const int kiDir[8] = { -1, -10, 1, 10, -9, -11, 11, 9};
+
+// Is given piece a certain type.
+const int pieceKnight[13] = { false, false, true, false, false, false, false, false, true, false, false, false, false };
+const int pieceKing[13] = { false, false, false, false, false, false, true, false, false, false, false, false, true };
+const int pieceRookQueen[13] = { false, false, false, false, true, true, false, false, false, false, true, true, false };
+const int pieceBishopQueen[13] = { false, false, false, true, false, true, false, false, false, true, false, true, false };
 
 /* MACROS */
-// For a given file and rank, return the 120-based square number.
-#define FR2SQ(f, r) ( (21 + (f)) + ((r) * 10) )
+#define FR2SQ(f, r) ( (21 + (f)) + ((r) * 10) )  // For a given file and rank, return the 120-based square number.
+#define isBQ(p) (pieceBishopQueen[(p)])
+#define isRQ(p) (pieceRookQueen[(p)])
+#define isKn(p) (pieceKnight[(p)])
+#define isKi(p) (pieceKing[(p)])
 
 #endif //BLUE_DEFS_H

@@ -21,7 +21,7 @@ PosKey::PosKey(const Board* pos) {
     // Pieces.
     for(sq = 0; sq < BRD_SQ_NUM; ++sq) {
         piece = pos->pieces[sq];
-        if(piece != NO_SQ && piece != EMPTY) {
+        if(piece != NO_SQ && piece != EMPTY && piece != OFFBOARD) {
             assert(piece >= wP && piece <= bK);
             finalKey ^= pieceKeys[piece][sq];
         }
