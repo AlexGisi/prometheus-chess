@@ -28,6 +28,8 @@ public:
     static void initSq120To64();
     static void initFilesRanksBrd();
 
+    static std::string sqToStr(int sq);
+
     void reset();
     void updateListsMaterial();
     bool checkBoard() const;

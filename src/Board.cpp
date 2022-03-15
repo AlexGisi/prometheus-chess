@@ -516,6 +516,13 @@ void Board::showSqAttBySide(int att_side) const {
     printf("\n\n");
 }
 
+std::string Board::sqToStr(const int sq) {
+    int file = filesBrd[sq];
+    int rank = ranksBrd[sq];
+
+    return std::to_string('a' + file) + std::to_string('1' + rank);
+}
+
 
 int Board::sq120ToSq64[BRD_SQ_NUM];
 int Board::sq64ToSq120[64];

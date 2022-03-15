@@ -3,6 +3,6 @@ project(blue VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(blue src/main.cpp src/Board.cpp src/BitBoard.cpp src/PosKey.cpp src/PosKey.h)
+add_executable(blue src/main.cpp src/Board.cpp src/BitBoard.cpp src/PosKey.cpp src/PosKey.h src/Move.cpp src/Move.h)
 
 target_include_directories(blue PUBLIC)
