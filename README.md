@@ -8,3 +8,6 @@ A conventional chess engine.
 - Perft testing
 - Search
 - UCI communication
+
+# Acknowledgments
+The board representation and move generation code is largely a C++ adaptation of [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C" tutorial.
