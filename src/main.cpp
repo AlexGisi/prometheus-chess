@@ -3,8 +3,9 @@
 #include "Defs.h"
 #include "PosKey.h"
 #include "Move.h"
+#include "MoveGen.h"
 
-#define FEN1 "8/8/8/3B4/8/8/8/3R4 w - - 0 2"
+#define FEN1 "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1"
 
 void init() {
     Board::initSq120To64();
@@ -19,16 +20,12 @@ int main() {
     Board b1(FEN1);
     b1.print();
 
-    int m = 0;
-    int from = A2; int to = G5;
-    int cap = wR; int prom = bB;
-    m = (from) | (to << 7) | (cap << 14) | (prom << 20);
-    printf("\ndec:%d hex:%X\n", m, m);
+    MoveList ml;
+    ml.print();
 
-    Move move(m);
-
-    std::cout << move.from() << ' ' << move.to() << ' ' << move.captured() << ' ' << move.promoted() << std::endl;
-    std::cout << move.toStr() << std::endl;
+    MoveGen mg(b1);
+    mg.generateAllMoves(&ml);
+    ml.print();
 
     return 0;
 }

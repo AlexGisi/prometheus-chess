@@ -39,7 +39,6 @@ public:
 
     void print();
 
-private:
     int pieces[BRD_SQ_NUM];
     BitBoard pawns[3];  // WHITE, BLACK, BOTH.
 

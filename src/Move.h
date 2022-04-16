@@ -6,12 +6,14 @@
 #define BLUE_MOVE_H
 
 #include <string>
+#include "Defs.h"
 
 
 class Move {
 public:
     Move();
     explicit Move(int m);
+    Move(int from, int to, int cap, int pro, int f1);
 
     Move(const Move& rhs);
     Move& operator=(const Move& rhs);
@@ -28,9 +30,13 @@ public:
 
     std::string toStr() const;
 
-private:
     int move;
 };
+
+typedef struct {
+    Move move;
+    int score;
+} SearchMove;
 
 
 #endif //BLUE_MOVE_H

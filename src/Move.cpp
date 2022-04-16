@@ -26,6 +26,10 @@ Move::Move(int m) {
     move = m;
 }
 
+Move::Move(int from, int to, int cap, int pro, int f1) {
+    move = from | (to << 7) | (cap << 14) | (pro << 20 | f1);
+}
+
 Move::Move(const Move &rhs) {
     move = rhs.move;
 }

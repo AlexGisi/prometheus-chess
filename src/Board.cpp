@@ -6,6 +6,7 @@
 #include <cctype>
 #include <sstream>
 #include "Board.h"
+#include "assertions.cpp"
 
 Board::Board() {
     setUpEmpty();
@@ -434,6 +435,10 @@ bool Board::checkBoard() const {
 
 // Determine if a square is attacked by a side.
 bool Board::sqAttacked(const int sq, const int att_side) const {
+    assert(sqOnBoard(sq));
+    assert(sideValid(side));
+    assert(checkBoard());
+
     int pce, idx, t_sq, dir = 0;
 
     // Pawns.

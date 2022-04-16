@@ -13,6 +13,7 @@
 
 #define BRD_SQ_NUM 120
 #define MAX_GAME_MOVES 2048
+#define MAX_POSITION_MOVES 256
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -60,6 +61,14 @@ const int knDir[8] = { -8, -19, -21, -12, 8, 19, 21, 12 };
 const int rkDir[4] = { -1, -10, 1, 10 };
 const int biDir[4] = { -9, -11, 11, 9 };
 const int kiDir[8] = { -1, -10, 1, 10, -9, -11, 11, 9};
+
+// Move flags.
+#define MFLAGEP 0x40000
+#define MFLAGPS 0x80000
+#define MFLAGCA 0x1000000
+
+#define MFLAGCAP 0x7C000
+#define MFLAGPROM 0xF00000
 
 // Is given piece a certain type.
 const int pieceKnight[13] = { false, false, true, false, false, false, false, false, true, false, false, false, false };
