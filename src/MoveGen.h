@@ -21,7 +21,10 @@ private:
     static void addEnPassantMove(const Move& m, MoveList *list);
 
     static void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
+    static void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
+
     static void addWhitePawnMove(int from, int to, MoveList *list);
+    static void addBlackPawnMove(int from, int to, MoveList *list);
 
     Board board;
 };
