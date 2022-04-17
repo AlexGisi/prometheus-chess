@@ -46,6 +46,9 @@ void MoveGen::generateAllMoves(MoveList *list) const {
     int pce = EMPTY;
     int side = board.side;
     int sq = 0, t_sq = 0, pceNum = 0;
+    int dir = 0, index = 0, pceIndex = 0;
+
+    printf("\n\nSide:%d\n", side);
 
     if(side == WHITE) {
         for(pceNum = 0; pceNum < board.pceNum[wP]; ++pceNum) {
@@ -72,8 +75,6 @@ void MoveGen::generateAllMoves(MoveList *list) const {
                 if(sq+11 == board.enPas)
                     addCaptureMove(Move(sq, sq+11, board.pieces[sq+1], EMPTY, MFLAGEP), list);
             }
-
-            // Etc.
         }
     } else {
         for(pceNum = 0; pceNum < board.pceNum[bP]; ++pceNum) {
@@ -101,12 +102,56 @@ void MoveGen::generateAllMoves(MoveList *list) const {
                 if(sq-11 == board.enPas)
                     addCaptureMove(Move(sq, sq-11, board.pieces[sq-1], EMPTY, MFLAGEP), list);
             }
-
         }
+    }
+
+    // Loop for slide pieces.
+    pceIndex = loopSlideIdx[side];
+    pce = loopSlidePce[pceIndex++];
+    while(pce != 0) {
+        assert(pieceValid(pce));
+        printf("Sliders pceIndex:%d pce: %d\n", pceIndex, pce);
+        pce = loopSlidePce[pceIndex++];
+    }
+
+    // Loop for non-slide pieces.
+    pceIndex = loopNonSlideIdx[side];
+    pce = loopNonSlidePce[pceIndex++];
+    while(pce != 0) {
+        assert(pieceValid(pce));
+        printf("Non-sliders pceIndex:%d pce: %d\n", pceIndex, pce);
+
+        for(pceNum = 0; pceNum < board.pceNum[pce]; ++pceNum) {
+            sq = board.pceList[pce][pceNum];
+            assert(sqOnBoard(sq));
+            printf("Piece: %c on %s\n", pceChar[pce], Board::sqToStr(sq).c_str());
+
+            for(index = 0; index < numDir[pce]; ++index) {
+                dir = pceDir[pce][index];
+                t_sq = sq + dir;
+
+                if(sqOffBoard(t_sq))
+                    continue;
+
+                if(board.pieces[t_sq] != EMPTY) {
+                    if(pieceCol[board.pieces[t_sq]] == !side) {
+                        std::cout << "\t\tCapture on " << Board::sqToStr(t_sq) << std::endl;
+                    }
+                    continue;
+                }
+                std::cout << "\t\tNormal on " << Board::sqToStr(t_sq) << std::endl;
+            }
+        }
+
+        pce = loopNonSlidePce[pceIndex++];
     }
 }
 
 void MoveGen::addWhitePawnCapMove(int from, int to, int cap, MoveList *list) {
+    assert(pieceValidEmpty(cap));
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
     if(Board::ranksBrd[from] == RANK_7) {
         addCaptureMove(Move(from, to, cap, wQ, 0), list);
         addCaptureMove(Move(from, to, cap, wR, 0), list);
@@ -118,6 +163,10 @@ void MoveGen::addWhitePawnCapMove(int from, int to, int cap, MoveList *list) {
 }
 
 void MoveGen::addBlackPawnCapMove(int from, int to, int cap, MoveList *list) {
+    assert(pieceValidEmpty(cap));
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
     if(Board::ranksBrd[from] == RANK_2) {
         addCaptureMove(Move(from, to, cap, bQ, 0), list);
         addCaptureMove(Move(from, to, cap, bR, 0), list);
@@ -129,6 +178,9 @@ void MoveGen::addBlackPawnCapMove(int from, int to, int cap, MoveList *list) {
 }
 
 void MoveGen::addWhitePawnMove(int from, int to, MoveList *list) {
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
     if(Board::ranksBrd[from] == RANK_7) {
         addQuietMove(Move(from, to, EMPTY, wQ, 0), list);
         addQuietMove(Move(from, to, EMPTY, wR, 0), list);
@@ -140,6 +192,9 @@ void MoveGen::addWhitePawnMove(int from, int to, MoveList *list) {
 }
 
 void MoveGen::addBlackPawnMove(int from, int to, MoveList *list) {
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
     if(Board::ranksBrd[from] == RANK_2) {
         addQuietMove(Move(from, to, EMPTY, bQ, 0), list);
         addQuietMove(Move(from, to, EMPTY, bR, 0), list);

@@ -34,14 +34,13 @@ void Board::setUpEmpty() {
 
     for(int & num : pceNum)
         num = 0;
-    for(int & num : bigPce)
-        num = 0;
-    for(int & num : majPce)
-        num = 0;
-    for(int & num : minPce)
-        num = 0;
-    for(int & num : material)
-        num = 0;
+
+    for(int i=0; i < 2; i++) {
+        bigPce[i] = 0;
+        majPce[i] = 0;
+        minPce[i] = 0;
+        material[i] = 0;
+    }
 
     castlePerm = 0;
 
@@ -522,10 +521,13 @@ void Board::showSqAttBySide(int att_side) const {
 }
 
 std::string Board::sqToStr(const int sq) {
-    int file = filesBrd[sq];
-    int rank = ranksBrd[sq];
+    std::string s1;
+    std::string s2;
 
-    return std::to_string('a' + file) + std::to_string('1' + rank);
+    s1 = (char) ('a' + (char) filesBrd[sq]);
+    s2 = (char) ('1' + (char) ranksBrd[sq]);
+
+    return s1 + s2;
 }
 
 

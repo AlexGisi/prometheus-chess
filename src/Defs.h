@@ -75,6 +75,7 @@ const int pieceKnight[13] = { false, false, true, false, false, false, false, fa
 const int pieceKing[13] = { false, false, false, false, false, false, true, false, false, false, false, false, true };
 const int pieceRookQueen[13] = { false, false, false, false, true, true, false, false, false, false, true, true, false };
 const int pieceBishopQueen[13] = { false, false, false, true, false, true, false, false, false, true, false, true, false };
+const int pieceSlides[13] = { false, false, false, true, true, true, false, false, false, true, true, true, false };
 
 /* MACROS */
 #define FR2SQ(f, r) ( (21 + (f)) + ((r) * 10) )  // For a given file and rank, return the 120-based square number.
