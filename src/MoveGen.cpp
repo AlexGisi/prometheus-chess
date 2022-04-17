@@ -107,11 +107,32 @@ void MoveGen::generateAllMoves(MoveList *list) const {
 
     // Loop for slide pieces.
     pceIndex = loopSlideIdx[side];
-    pce = loopSlidePce[pceIndex++];
+    pce = loopSlidePce[pceIndex];
     while(pce != 0) {
         assert(pieceValid(pce));
-        printf("Sliders pceIndex:%d pce: %d\n", pceIndex, pce);
         pce = loopSlidePce[pceIndex++];
+
+        for(pceNum = 0; pceNum < board.pceNum[pce]; ++pceNum) {
+            sq = board.pceList[pce][pceNum];
+            assert(sqOnBoard(sq));
+            printf("Piece: %c on %s\n", pceChar[pce], Board::sqToStr(sq).c_str());
+
+            for(index = 0; index < numDir[pce]; ++index) {
+                dir = pceDir[pce][index];
+                t_sq = sq + dir;
+
+                while(!sqOffBoard(t_sq)) {
+                    if(board.pieces[t_sq] != EMPTY) {
+                        if(pieceCol[board.pieces[t_sq]] == !side) {
+                            std::cout << "\t\tCapture on " << Board::sqToStr(t_sq) << std::endl;
+                        }
+                        break;
+                    }
+                    std::cout << "\t\tNormal on " << Board::sqToStr(t_sq) << std::endl;
+                    t_sq += dir;
+                }
+            }
+        }
     }
 
     // Loop for non-slide pieces.
@@ -119,7 +140,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
     pce = loopNonSlidePce[pceIndex++];
     while(pce != 0) {
         assert(pieceValid(pce));
-        printf("Non-sliders pceIndex:%d pce: %d\n", pceIndex, pce);
+        printf("Non-sliders pceIndex:%d pce: %d\n", pceIndex-1, pce);
 
         for(pceNum = 0; pceNum < board.pceNum[pce]; ++pceNum) {
             sq = board.pceList[pce][pceNum];
