@@ -76,6 +76,22 @@ void MoveGen::generateAllMoves(MoveList *list) const {
                     addCaptureMove(Move(sq, sq+11, board.pieces[sq+1], EMPTY, MFLAGEP), list);
             }
         }
+
+        // Generate short castle.
+        if(board.castlePerm & WKCA) {
+            if(board.pieces[F1] == EMPTY && board.pieces[G1] == EMPTY) {
+                if(!board.sqAttacked(E1, BLACK) && !board.sqAttacked(F1, BLACK))
+                    printf("WKCA movegen\n");
+            }
+        }
+
+        // Generate long castle.
+        if(board.castlePerm & WQCA) {
+            if(board.pieces[D1] == EMPTY && board.pieces[C1] == EMPTY && board.pieces[B1] == EMPTY) {
+                if(!board.sqAttacked(E1, BLACK) && !board.sqAttacked(D1, BLACK))
+                    printf("WQCA movegen\n");
+            }
+        }
     } else {
         for(pceNum = 0; pceNum < board.pceNum[bP]; ++pceNum) {
             sq = board.pceList[bP][pceNum];
@@ -101,6 +117,22 @@ void MoveGen::generateAllMoves(MoveList *list) const {
                     addCaptureMove(Move(sq, sq-9, board.pieces[sq+1], EMPTY, MFLAGEP), list);
                 if(sq-11 == board.enPas)
                     addCaptureMove(Move(sq, sq-11, board.pieces[sq-1], EMPTY, MFLAGEP), list);
+            }
+        }
+
+        // Generate short castle.
+        if(board.castlePerm & BKCA) {
+            if(board.pieces[F8] == EMPTY && board.pieces[G8] == EMPTY) {
+                if(!board.sqAttacked(E8, WHITE) && !board.sqAttacked(F8, WHITE))
+                    printf("BKCA movegen\n");
+            }
+        }
+
+        // Generate long castle.
+        if(board.castlePerm & BQCA) {
+            if(board.pieces[D8] == EMPTY && board.pieces[C8] == EMPTY && board.pieces[B8] == EMPTY) {
+                if(!board.sqAttacked(E8, WHITE) && !board.sqAttacked(D8, WHITE))
+                    printf("BQCA movegen\n");
             }
         }
     }
