@@ -48,8 +48,6 @@ void MoveGen::generateAllMoves(MoveList *list) const {
     int sq = 0, t_sq = 0, pceNum = 0;
     int dir = 0, index = 0, pceIndex = 0;
 
-    printf("\n\nSide:%d\n", side);
-
     if(side == WHITE) {
         for(pceNum = 0; pceNum < board.pceNum[wP]; ++pceNum) {
             sq = board.pceList[wP][pceNum];
@@ -81,7 +79,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
         if(board.castlePerm & WKCA) {
             if(board.pieces[F1] == EMPTY && board.pieces[G1] == EMPTY) {
                 if(!board.sqAttacked(E1, BLACK) && !board.sqAttacked(F1, BLACK))
-                    printf("WKCA movegen\n");
+                    addQuietMove(Move(E1, G1, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
 
@@ -89,7 +87,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
         if(board.castlePerm & WQCA) {
             if(board.pieces[D1] == EMPTY && board.pieces[C1] == EMPTY && board.pieces[B1] == EMPTY) {
                 if(!board.sqAttacked(E1, BLACK) && !board.sqAttacked(D1, BLACK))
-                    printf("WQCA movegen\n");
+                    addQuietMove(Move(E1, C1, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
     } else {
@@ -124,7 +122,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
         if(board.castlePerm & BKCA) {
             if(board.pieces[F8] == EMPTY && board.pieces[G8] == EMPTY) {
                 if(!board.sqAttacked(E8, WHITE) && !board.sqAttacked(F8, WHITE))
-                    printf("BKCA movegen\n");
+                    addQuietMove(Move(E8, G8, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
 
@@ -132,7 +130,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
         if(board.castlePerm & BQCA) {
             if(board.pieces[D8] == EMPTY && board.pieces[C8] == EMPTY && board.pieces[B8] == EMPTY) {
                 if(!board.sqAttacked(E8, WHITE) && !board.sqAttacked(D8, WHITE))
-                    printf("BQCA movegen\n");
+                    addQuietMove(Move(E8, C8, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
     }
@@ -147,7 +145,6 @@ void MoveGen::generateAllMoves(MoveList *list) const {
         for(pceNum = 0; pceNum < board.pceNum[pce]; ++pceNum) {
             sq = board.pceList[pce][pceNum];
             assert(sqOnBoard(sq));
-            printf("Piece: %c on %s\n", pceChar[pce], Board::sqToStr(sq).c_str());
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
@@ -155,12 +152,11 @@ void MoveGen::generateAllMoves(MoveList *list) const {
 
                 while(!sqOffBoard(t_sq)) {
                     if(board.pieces[t_sq] != EMPTY) {
-                        if(pieceCol[board.pieces[t_sq]] == !side) {
-                            std::cout << "\t\tCapture on " << Board::sqToStr(t_sq) << std::endl;
-                        }
+                        if(pieceCol[board.pieces[t_sq]] == !side)
+                            addCaptureMove(Move(sq, t_sq, board.pieces[t_sq], EMPTY, 0), list);
                         break;
                     }
-                    std::cout << "\t\tNormal on " << Board::sqToStr(t_sq) << std::endl;
+                    addQuietMove(Move(sq, t_sq, EMPTY, EMPTY, 0), list);
                     t_sq += dir;
                 }
             }
@@ -172,12 +168,10 @@ void MoveGen::generateAllMoves(MoveList *list) const {
     pce = loopNonSlidePce[pceIndex++];
     while(pce != 0) {
         assert(pieceValid(pce));
-        printf("Non-sliders pceIndex:%d pce: %d\n", pceIndex-1, pce);
 
         for(pceNum = 0; pceNum < board.pceNum[pce]; ++pceNum) {
             sq = board.pceList[pce][pceNum];
             assert(sqOnBoard(sq));
-            printf("Piece: %c on %s\n", pceChar[pce], Board::sqToStr(sq).c_str());
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
@@ -188,11 +182,11 @@ void MoveGen::generateAllMoves(MoveList *list) const {
 
                 if(board.pieces[t_sq] != EMPTY) {
                     if(pieceCol[board.pieces[t_sq]] == !side) {
-                        std::cout << "\t\tCapture on " << Board::sqToStr(t_sq) << std::endl;
+                        addCaptureMove(Move(sq, t_sq, board.pieces[t_sq], EMPTY, 0), list);
                     }
                     continue;
                 }
-                std::cout << "\t\tNormal on " << Board::sqToStr(t_sq) << std::endl;
+                addQuietMove(Move(sq, t_sq, EMPTY, EMPTY, 0), list);
             }
         }
 
