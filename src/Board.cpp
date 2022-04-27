@@ -530,6 +530,47 @@ std::string Board::sqToStr(const int sq) {
     return s1 + s2;
 }
 
+// Making moves.
+void Board::clearPiece(const int sq) {
+    assert(sqOnBoard(sq));
+
+    int pce = pieces[sq];
+    assert(pieceValid(pce));
+
+    int col = pieceCol[pce];
+    int index = 0;
+    int t_pceNum = -1;
+
+    posKey.hashPce(pce, sq);
+
+    pieces[sq] = EMPTY;
+    material[col] -= pieceVal[pce];
+
+    if(pieceBig[pce]) {
+        bigPce[col]--;
+        if(pieceMaj[pce])
+            majPce[col]--;
+        else
+            minPce[col]--;
+    } else {
+        pawns[col].clearBit(sq);
+        pawns[BOTH].clearBit(sq);
+    }
+
+    // Remove piece from piece list; see
+    // https://www.youtube.com/watch?v=F_L2AhqB4V4&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=39
+    // for detailed explanation.
+    for(index = 0; index < pceNum[pce]; ++index) {
+        if(pceList[pce][index] == sq) {
+            t_pceNum = index;
+            break;
+        }
+    }
+    assert(t_pceNum != -1);
+    pceNum[pce]--;
+    pceList[pce][t_pceNum] = pceList[pce][pceNum[pce]];
+}
+
 
 int Board::sq120ToSq64[BRD_SQ_NUM];
 int Board::sq64ToSq120[64];

@@ -104,9 +104,9 @@ void MoveGen::generateAllMoves(MoveList *list) const {
             }
 
             // Generate captures.
-            if(!sqOffBoard(sq) && pieceCol[board.pieces[sq-9]] == WHITE)
+            if(!sqOffBoard(sq-9) && pieceCol[board.pieces[sq-9]] == WHITE)
                 addBlackPawnCapMove(sq, sq-9, board.pieces[sq-9], list);
-            if(!sqOffBoard(sq) && pieceCol[board.pieces[sq-11]] == WHITE)
+            if(!sqOffBoard(sq-11) && pieceCol[board.pieces[sq-11]] == WHITE)
                 addBlackPawnCapMove(sq, sq-11, board.pieces[sq-11], list);
 
             // En passant captures.

@@ -67,6 +67,28 @@ void PosKey::initHashKeys() {
         castleKeys[idx] = rand_64();
 }
 
+PosKey::PosKey(const PosKey &rhs) {
+    val = rhs.val;
+}
+
+void PosKey::hashPce(const int pce, const int sq) {
+    val ^= pieceKeys[pce][sq];
+}
+
+void PosKey::hashCa(int castlePerm) {
+    val ^= castleKeys[castlePerm];
+}
+
+void PosKey::hash_side() {
+    val ^= sideKey;
+}
+
+void PosKey::hash_ep(int enPas) {
+    val ^= pieceKeys[EMPTY][enPas];
+}
+
+PosKey &PosKey::operator=(const PosKey &rhs) = default;
+
 uint64_t PosKey::pieceKeys[13][120];
 uint64_t PosKey::sideKey;
 uint64_t PosKey::castleKeys[16];

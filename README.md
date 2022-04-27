@@ -6,6 +6,7 @@ A conventional chess engine.
 - Board setup/FEN parsing
 - Check square attacked
 - Move representation
+- Move generation
 
 # To-Do
 - Do/undo moves

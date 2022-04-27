@@ -84,6 +84,9 @@ public:
     int pceList[13][10];
 
     friend class PosKey;
+
+    // Making moves.
+    void clearPiece(int sq);
 };
 
 

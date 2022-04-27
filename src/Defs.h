@@ -77,6 +77,22 @@ const int pieceRookQueen[13] = { false, false, false, false, true, true, false, 
 const int pieceBishopQueen[13] = { false, false, false, true, false, true, false, false, false, true, false, true, false };
 const int pieceSlides[13] = { false, false, false, true, true, true, false, false, false, true, true, true, false };
 
+// Castle permission: used for bitwise or with board.castlePerm.
+const int CastlePerm[120] = {
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 13, 15, 15, 15, 12, 15, 15, 14, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15,  7, 15, 15, 15,  3, 15, 15, 11, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+};
+
 /* MACROS */
 #define FR2SQ(f, r) ( (21 + (f)) + ((r) * 10) )  // For a given file and rank, return the 120-based square number.
 #define isBQ(p) (pieceBishopQueen[(p)])
