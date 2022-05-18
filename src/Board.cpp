@@ -30,7 +30,7 @@ void Board::setUpEmpty() {
     fiftyMove = 0;
 
     ply = 0;
-    hisPlay = 0;
+    hisPly = 0;
 
     for(int & num : pceNum)
         num = 0;
@@ -70,7 +70,7 @@ Board::Board(const Board &rhs) {
     fiftyMove = rhs.fiftyMove;
 
     ply = rhs.ply;
-    hisPlay = rhs.hisPlay;
+    hisPly = rhs.hisPly;
 
     for(int i=0; i < 13; ++i)
         pceNum[i] = rhs.pceNum[i];
@@ -113,7 +113,7 @@ Board &Board::operator=(const Board &rhs) {
     fiftyMove = rhs.fiftyMove;
 
     ply = rhs.ply;
-    hisPlay = rhs.hisPlay;
+    hisPly = rhs.hisPly;
 
     for(int i=0; i < 13; ++i)
         pceNum[i] = rhs.pceNum[i];
@@ -571,6 +571,233 @@ void Board::clearPiece(const int sq) {
     pceList[pce][t_pceNum] = pceList[pce][pceNum[pce]];
 }
 
+void Board::addPiece(const int sq, const int pce) {
+    assert(pieceValid(pce));
+    assert(sqOnBoard(sq));
+
+    int col = pieceCol[pce];
+
+    posKey.hashPce(pce, sq);
+
+    pieces[sq] = pce;
+
+    if(pieceBig[pce]) {
+        bigPce[col]++;
+        if(pieceMaj[pce])
+            majPce[col]++;
+        else
+            minPce[col]++;
+    } else {
+        pawns[col].setBit(sq120ToSq64[sq]); // TODO: sq is 120, right?
+        pawns[BOTH].setBit(sq120ToSq64[sq]);
+    }
+    material[col] += pieceVal[pce];
+    pceList[pce][pceNum[pce]++] = sq;
+}
+
+void Board::movePiece(const int from, const int to) {
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
+    int idx = 0;
+    int pce = pieces[from];
+    int col = pieceCol[pce];
+
+    int t_pieceNum = false; // TODO: remove
+
+    posKey.hashPce(pce, from);
+    pieces[from] = EMPTY;
+
+    posKey.hashPce(pce, to);
+    pieces[to] = pce;
+
+    if(!pieceBig[pce]) {
+        pawns[col].clearBit(sq64ToSq120[from]);
+        pawns[BOTH].clearBit(sq64ToSq120[from]);
+        pawns[col].setBit(sq64ToSq120[to]);
+        pawns[BOTH].setBit(sq64ToSq120[to]);
+    }
+
+    for(idx = 0; idx < pceNum[pce]; ++idx) {
+        if(pceList[pce][idx] == from) {
+            pceList[pce][idx] = to;
+            t_pieceNum = true;  // TODO: remove debug
+            break;
+        }
+    }
+    assert(t_pieceNum);
+}
+
+bool Board::makeMove(Move& move) {
+    assert(checkBoard());
+
+    int from = move.from();
+    int to = move.to();
+
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+    assert(sideValid(side));
+    assert(pieceValid(pieces[from]));
+
+    history[hisPly].posKey = posKey;
+
+    if(move.ep_capture()) {
+        if(side == WHITE)
+            clearPiece(to-10);
+        else
+            clearPiece(to+10);
+    } else if (move.castle()) {
+        switch(to) {
+            case C1:
+                movePiece(A1, D1);
+                break;
+            case C8:
+                movePiece(A8, D8);
+                break;
+            case G1:
+                movePiece(H1, F1);
+                break;
+            case G8:
+                movePiece(H8, F8);
+                break;
+            default:
+                assert(false);
+                break;
+        }
+    }
+
+    if(enPas != NO_SQ) posKey.hashEp(enPas);
+    posKey.hashCa(castlePerm);
+
+    history[hisPly].move = move;
+    history[hisPly].fiftyMove = fiftyMove;
+    history[hisPly].enPas = enPas;
+    history[hisPly].castlePerm = castlePerm;
+
+    castlePerm &= castlePermArr[from];
+    castlePerm &= castlePermArr[to];
+    enPas = NO_SQ;
+
+    posKey.hashCa(castlePerm);
+
+    int cap = move.captured();
+    fiftyMove++;
+    if(cap != EMPTY) {
+        assert(pieceValid(cap));
+        clearPiece(to);
+        fiftyMove = 0;
+    }
+
+    hisPly++;
+    ply++;
+
+    if(piecePawn[pieces[from]]) {
+        fiftyMove = 0;
+        if(move.pawn_start()) {
+            if(side == WHITE) {
+                enPas = from+10;
+                assert(ranksBrd[enPas == RANK_3]);
+            } else {
+                enPas = from-10;
+                assert(ranksBrd[enPas] == RANK_6);
+            }
+            posKey.hashEp(enPas);
+        }
+    }
+
+    movePiece(from, to);
+
+    // Check promotion.
+    int pro = move.promoted();
+    if(pro != EMPTY) {
+        assert(pieceValid(pro) && !piecePawn[pro]);
+        clearPiece(to);
+        addPiece(to, pro);
+    }
+
+    // TODO: remove debug
+    if(pieceKing[pieces[to]]) {
+        kingSq[side] = to;
+    }
+
+    side ^= 1;
+    posKey.hashSide();
+
+    assert(checkBoard());
+
+    // Ensure the move didn't leave the king in check.
+    if(sqAttacked(kingSq[side], side)) {
+        // takemove
+        return false;
+    }
+
+    return true;
+}
+
+// TODO: Just use posKey from history instead of re-hashing.
+void Board::takeMove() {
+    assert(checkBoard());
+
+    hisPly--;
+    ply--;
+
+    Move move = history[hisPly].move;
+    int from = move.from();
+    int to = move.to();
+
+    assert(sqOnBoard(from));
+    assert(sqOnBoard(to));
+
+    if(enPas != NO_SQ) posKey.hashEp(enPas);
+    posKey.hashCa(castlePerm);
+
+    side ^= 1;
+    posKey.hashSide();
+
+    if(move.ep_capture()) {
+        if(side == WHITE)
+            addPiece(to-10, bP);
+        else
+            addPiece(to+10, wP);
+    } else if(move.castle()) {
+        switch (to) {
+            case C1:
+                movePiece(D1, A1);
+                break;
+            case C8:
+                movePiece(D8, A8);
+                break;
+            case G1:
+                movePiece(F1, H1);
+                break;
+            case G8:
+                movePiece(F8, H8);
+                break;
+            default:
+                assert(false);
+        }
+    }
+
+    movePiece(to, from);
+
+    if(pieceKing[pieces[from]])
+        kingSq[side] = from;
+
+    int cap = move.captured();
+    if(cap != EMPTY) {
+        assert(pieceValid(cap));
+        addPiece(to, cap);
+    }
+
+    int pro = move.promoted();
+    if(pro != EMPTY) {
+        assert(pieceValid(pro) && !piecePawn[pro]);
+        clearPiece(from);
+        addPiece(from, pieceCol[pro] == WHITE ? wP : bP);
+    }
+
+    assert(checkBoard());
+}
 
 int Board::sq120ToSq64[BRD_SQ_NUM];
 int Board::sq64ToSq120[64];

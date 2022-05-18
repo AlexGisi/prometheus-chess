@@ -76,9 +76,10 @@ const int pieceKing[13] = { false, false, false, false, false, false, true, fals
 const int pieceRookQueen[13] = { false, false, false, false, true, true, false, false, false, false, true, true, false };
 const int pieceBishopQueen[13] = { false, false, false, true, false, true, false, false, false, true, false, true, false };
 const int pieceSlides[13] = { false, false, false, true, true, true, false, false, false, true, true, true, false };
+const int piecePawn[13] = { false, true, false, false, false, false, false, true, false, false, false, false, false };
 
 // Castle permission: used for bitwise or with board.castlePerm.
-const int CastlePerm[120] = {
+const int castlePermArr[120] = {
         15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
         15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
         15, 13, 15, 15, 15, 12, 15, 15, 14, 15,

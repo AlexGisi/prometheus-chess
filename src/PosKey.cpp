@@ -79,11 +79,11 @@ void PosKey::hashCa(int castlePerm) {
     val ^= castleKeys[castlePerm];
 }
 
-void PosKey::hash_side() {
+void PosKey::hashSide() {
     val ^= sideKey;
 }
 
-void PosKey::hash_ep(int enPas) {
+void PosKey::hashEp(int enPas) {
     val ^= pieceKeys[EMPTY][enPas];
 }
 

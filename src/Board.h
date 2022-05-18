@@ -9,6 +9,7 @@
 #include "BitBoard.h"
 #include "Defs.h"
 #include "PosKey.h"
+#include "Move.h"
 
 class Board {
 public:
@@ -49,7 +50,7 @@ public:
     int fiftyMove;
 
     int ply;
-    int hisPlay;  // History.
+    int hisPly;  // History.
 
     PosKey posKey;
 
@@ -63,7 +64,7 @@ public:
 
     typedef struct {
         // Move about to be played.
-        int move;
+        Move move;
 
         // States prior to move.
         int castlePerm;
@@ -87,6 +88,10 @@ public:
 
     // Making moves.
     void clearPiece(int sq);
+    void addPiece(int sq, int pce);
+    void movePiece(int from, int to);
+    bool makeMove(Move& move);
+    void takeMove();
 };
 
 

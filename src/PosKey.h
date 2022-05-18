@@ -26,8 +26,8 @@ public:
     // In-place updates to the key.
     void hashPce(int pce, int sq);
     void hashCa(int castlePerm);
-    void hash_side();
-    void hash_ep(int enPas);
+    void hashSide();
+    void hashEp(int enPas);
 
     // Keys for possible states, random number for each state.
     static uint64_t pieceKeys[13][120];
