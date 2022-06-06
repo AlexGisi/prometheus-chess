@@ -7,9 +7,9 @@ A conventional chess engine.
 - Check square attacked
 - Move representation
 - Move generation
+- Do/undo moves
 
 # To-Do
-- Do/undo moves
 - Perft testing
 - Search
 - UCI communication
