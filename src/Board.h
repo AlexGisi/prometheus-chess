@@ -13,7 +13,7 @@
 
 class Board {
 public:
-    Board();
+    Board();  // Create an empty board.
     explicit Board(const std::string& fen);
 
     Board(const Board& rhs);
@@ -38,7 +38,7 @@ public:
     bool sqAttacked(int sq, int att_side) const;
     void showSqAttBySide(int side) const;
 
-    void print();
+    void print() const;
 
     int pieces[BRD_SQ_NUM];
     BitBoard pawns[3];  // WHITE, BLACK, BOTH.

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cctype>
 #include <sstream>
+#include <exception>
 #include "Board.h"
 #include "assertions.cpp"
 
@@ -26,7 +27,7 @@ void Board::setUpEmpty() {
     kingSq[1] = NO_SQ;
 
     side = WHITE;
-    enPas = 0;
+    enPas = NO_SQ;
     fiftyMove = 0;
 
     ply = 0;
@@ -188,7 +189,7 @@ Board::Board(const std::string& fen) {
                 continue;
 
             default:
-                ; // TODO: throw error if another character appears.
+                throw std::runtime_error("Erroneous character in fen");
         }
 
         for(i = 0; i < count; i++) {
@@ -214,7 +215,7 @@ Board::Board(const std::string& fen) {
             case 'q': castlePerm |= BQCA; break;
             case '-': break;
             default:
-                std::cout << "Error: read wrong character in castling string: " << c << std::endl; // TODO: throw.
+                throw std::runtime_error("Erroneous character in castling permission string.");
         }
     }
     ss >> c; // Space.
@@ -270,7 +271,7 @@ void Board::reset() {
     *this = Board();
 }
 
-void Board::print() {
+void Board::print() const {
     int sq, file, rank, piece;
     for(rank = RANK_8; rank >= RANK_1; rank--) {
         std::cout << rank+1 << ' ';
@@ -612,10 +613,10 @@ void Board::movePiece(const int from, const int to) {
     pieces[to] = pce;
 
     if(!pieceBig[pce]) {
-        pawns[col].clearBit(sq64ToSq120[from]);
-        pawns[BOTH].clearBit(sq64ToSq120[from]);
-        pawns[col].setBit(sq64ToSq120[to]);
-        pawns[BOTH].setBit(sq64ToSq120[to]);
+        pawns[col].clearBit(sq120ToSq64[from]);
+        pawns[BOTH].clearBit(sq120ToSq64[from]);
+        pawns[col].setBit(sq120ToSq64[to]);
+        pawns[BOTH].setBit(sq120ToSq64[to]);
     }
 
     for(idx = 0; idx < pceNum[pce]; ++idx) {
@@ -726,15 +727,14 @@ bool Board::makeMove(Move& move) {
     assert(checkBoard());
 
     // Ensure the move didn't leave the king in check.
-    if(sqAttacked(kingSq[side], side)) {
-        // takemove
+    if(sqAttacked(kingSq[side^1], side)) {
+        takeMove();
         return false;
     }
 
     return true;
 }
 
-// TODO: Just use posKey from history instead of re-hashing.
 void Board::takeMove() {
     assert(checkBoard());
 
@@ -748,11 +748,11 @@ void Board::takeMove() {
     assert(sqOnBoard(from));
     assert(sqOnBoard(to));
 
-    if(enPas != NO_SQ) posKey.hashEp(enPas);
-    posKey.hashCa(castlePerm);
+    castlePerm = history[hisPly].castlePerm;
+    fiftyMove = history[hisPly].fiftyMove;
+    enPas = history[hisPly].enPas;
 
     side ^= 1;
-    posKey.hashSide();
 
     if(move.ep_capture()) {
         if(side == WHITE)
@@ -795,6 +795,8 @@ void Board::takeMove() {
         clearPiece(from);
         addPiece(from, pieceCol[pro] == WHITE ? wP : bP);
     }
+
+    posKey = history[hisPly].posKey;
 
     assert(checkBoard());
 }

@@ -24,14 +24,28 @@ void init() {
 int main() {
     init();
 
-    Board b1(CASTLE2);
-    b1.print();
-
+    Board board(START_FEN);
     MoveList ml;
-
-    MoveGen mg(b1);
+    MoveGen mg(board);
     mg.generateAllMoves(&ml);
-    ml.print();
+
+    int mvNum = 0;
+    Move mv;
+
+    for(mvNum = 0; mvNum < ml.count; ++mvNum) {
+        mv = ml.moves[mvNum].move;
+
+        if (!board.makeMove(mv))
+            continue;
+
+        std::cout << "Made: " << mv.toStr() << std::endl;
+        board.print();
+        board.takeMove();
+        std::cout << "Taken: " << mv.toStr() << std::endl;
+        board.print();
+
+        getchar();
+    }
 
     return 0;
 }

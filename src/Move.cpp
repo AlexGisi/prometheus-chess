@@ -64,10 +64,12 @@ bool Move::castle() const {
     return move & 0x1000000;
 }
 
+// TODO: if used must add properr flag to moves in MoveGen.cpp
 bool Move::capture() const {
     return move & 0x7C000;
 }
 
+// TODO: if used must add properr flag to moves in MoveGen.cpp
 bool Move::promotion() const {
     return move & 0xF00000;
 }

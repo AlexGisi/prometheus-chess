@@ -58,7 +58,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
             if(board.pieces[sq+10] == EMPTY) {
                 addWhitePawnMove(sq, sq+10, list);
                 if(Board::ranksBrd[sq] == RANK_2 && board.pieces[sq+20] == EMPTY)
-                    addQuietMove(Move(sq, sq+20, EMPTY, EMPTY, MFLAGEP), list);
+                    addQuietMove(Move(sq, sq+20, EMPTY, EMPTY, MFLAGPS), list);
             }
 
             // Generate captures.
@@ -100,7 +100,7 @@ void MoveGen::generateAllMoves(MoveList *list) const {
             if(board.pieces[sq-10] == EMPTY) {
                 addBlackPawnMove(sq, sq-10, list);
                 if(Board::ranksBrd[sq] == RANK_7 && board.pieces[sq-20] == EMPTY)
-                    addQuietMove(Move(sq, sq-20, EMPTY, EMPTY, MFLAGEP), list);
+                    addQuietMove(Move(sq, sq-20, EMPTY, EMPTY, MFLAGPS), list);
             }
 
             // Generate captures.
