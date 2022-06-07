@@ -291,7 +291,7 @@ std::string Board::to_str() const {
         ss << std::endl;
     }
 
-    ss << std::endl;
+    ss << std::endl << "  ";
     for(file = FILE_A; file <= FILE_H; file++) {
         ss << std::setw(3) << char('a' + file);
     }
@@ -826,7 +826,8 @@ u64 Board::perft(int depth) {
     MoveList ml;
     mg.generateAllMoves(&ml);
     for(int i = 0; i < ml.count; i++) {
-        makeMove(ml.moves[i].move);
+        if (!makeMove(ml.moves[i].move))
+            continue;
         nodes += perft(depth-1);
         takeMove();
     }
