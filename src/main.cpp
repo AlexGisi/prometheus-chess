@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "Board.h"
 #include "Defs.h"
 #include "PosKey.h"
@@ -17,9 +18,8 @@ void init() {
 int main() {
     init();
 
-    Board board(START_FEN);
-    u64 n = board.perft(5);
-    cout << "perft: " << n << endl;
+    Board b(START_FEN);
+    b.perft_suite(4);
 
     return 0;
 }
