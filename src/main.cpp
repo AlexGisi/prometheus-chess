@@ -18,7 +18,7 @@ int main() {
     init();
 
     Board board(START_FEN);
-    u64 n = board.perft(4);
+    u64 n = board.perft(5);
     cout << "perft: " << n << endl;
 
     return 0;

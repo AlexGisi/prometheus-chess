@@ -432,6 +432,7 @@ bool Board::checkBoard() const {
     assert(t_bigPce[WHITE]==bigPce[WHITE] && t_bigPce[BLACK]==bigPce[BLACK]);
 
     assert(side==WHITE || side==BLACK);
+    print();
     assert(PosKey(this) == posKey);
 
     assert(enPas==NO_SQ || (ranksBrd[enPas]==RANK_6 && side==WHITE)
@@ -601,7 +602,7 @@ void Board::addPiece(const int sq, const int pce) {
         else
             minPce[col]++;
     } else {
-        pawns[col].setBit(sq120ToSq64[sq]); // TODO: sq is 120, right?
+        pawns[col].setBit(sq120ToSq64[sq]);
         pawns[BOTH].setBit(sq120ToSq64[sq]);
     }
     material[col] += pieceVal[pce];
@@ -696,7 +697,7 @@ bool Board::makeMove(Move& move) {
     fiftyMove++;
 
     int cap = move.captured();
-    if(cap != EMPTY) {
+    if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
         clearPiece(to);
         fiftyMove = 0;
@@ -797,7 +798,7 @@ void Board::takeMove() {
         kingSq[side] = from;
 
     int cap = move.captured();
-    if(cap != EMPTY) {
+    if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
         addPiece(to, cap);
     }
