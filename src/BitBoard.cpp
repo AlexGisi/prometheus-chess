@@ -1,6 +1,9 @@
 //
 // Created by Alex Gisi on 2/17/22.
 //
+// Important: bitboards refer to squares with a 64-square representation, not 120
+// like most of the program.
+//
 
 #include <iostream>
 #include "BitBoard.h"

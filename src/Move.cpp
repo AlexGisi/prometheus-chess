@@ -74,7 +74,7 @@ bool Move::promotion() const {
     return move & 0xF00000;
 }
 
-std::string Move::toStr() const {
+std::string Move::to_str() const {
     std::stringstream ss;
     std::string s;
 

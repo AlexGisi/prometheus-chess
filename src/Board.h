@@ -38,6 +38,7 @@ public:
     bool sqAttacked(int sq, int att_side) const;
     void showSqAttBySide(int side) const;
 
+    std::string to_str() const;
     void print() const;
 
     int pieces[BRD_SQ_NUM];
@@ -92,6 +93,8 @@ public:
     void movePiece(int from, int to);
     bool makeMove(Move& move);
     void takeMove();
+
+    u64 perft(int depth);
 };
 
 

@@ -6,7 +6,9 @@
 #include <cctype>
 #include <sstream>
 #include <exception>
+#include <iomanip>
 #include "Board.h"
+#include "MoveGen.h"
 #include "assertions.cpp"
 
 Board::Board() {
@@ -272,32 +274,40 @@ void Board::reset() {
 }
 
 void Board::print() const {
+    std::cout << to_str() << std::endl;
+}
+
+std::string Board::to_str() const {
+    std::stringstream ss;
+
     int sq, file, rank, piece;
     for(rank = RANK_8; rank >= RANK_1; rank--) {
-        std::cout << rank+1 << ' ';
+        ss << rank+1 << ' ';
         for(file = FILE_A; file <= FILE_H; file++) {
             sq = FR2SQ(file, rank);
             piece = pieces[sq];
-            printf("%3c", pceChar[piece]);
+            ss << std::setw(3) << pceChar[piece];
         }
-        std::cout << std::endl;
+        ss << std::endl;
     }
 
-    std::cout << "\n  ";
+    ss << std::endl;
     for(file = FILE_A; file <= FILE_H; file++) {
-        printf("%3c", 'a'+file);
+        ss << std::setw(3) << char('a' + file);
     }
-    std::cout << std::endl;
+    ss << std::endl;
 
-    printf("side:%c\n", sideChar[side]);
-    printf("enPas:%d\n", enPas);
-    printf("castle:%c%c%c%c\n",
-           (castlePerm & WKCA) ? 'K' : '-',
-           (castlePerm & WQCA) ? 'Q' : '-',
-           (castlePerm & BKCA) ? 'k' : '-',
-           (castlePerm & BQCA) ? 'q' : '-'
-           );
-    printf("PosKey:%llX\n", posKey.val);
+    ss << "Side: " << sideChar[side] << std::endl;
+    ss << "EnPas: " << enPas << std::endl;
+    ss << "Castle: ";
+    ss << ( (castlePerm & WKCA) ? 'K' : '-' );
+    ss << ( (castlePerm & WQCA) ? 'Q' : '-' );
+    ss << ( (castlePerm & BKCA) ? 'k' : '-' );
+    ss << ( (castlePerm & BQCA) ? 'q' : '-' );
+    ss << std::endl;
+    ss << "PosKey: " << posKey.val << std::endl;
+
+    return ss.str();
 }
 
 void Board::updateListsMaterial() {
@@ -531,7 +541,9 @@ std::string Board::sqToStr(const int sq) {
     return s1 + s2;
 }
 
-// Making moves.
+/*
+ * sq: 120-based square
+ */
 void Board::clearPiece(const int sq) {
     assert(sqOnBoard(sq));
 
@@ -554,8 +566,8 @@ void Board::clearPiece(const int sq) {
         else
             minPce[col]--;
     } else {
-        pawns[col].clearBit(sq);
-        pawns[BOTH].clearBit(sq);
+        pawns[col].clearBit(sq120ToSq64[sq]);
+        pawns[BOTH].clearBit(sq120ToSq64[sq]);
     }
 
     // Remove piece from piece list; see
@@ -681,8 +693,9 @@ bool Board::makeMove(Move& move) {
 
     posKey.hashCa(castlePerm);
 
-    int cap = move.captured();
     fiftyMove++;
+
+    int cap = move.captured();
     if(cap != EMPTY) {
         assert(pieceValid(cap));
         clearPiece(to);
@@ -799,6 +812,26 @@ void Board::takeMove() {
     posKey = history[hisPly].posKey;
 
     assert(checkBoard());
+}
+
+/*
+ * Ref: https://www.chessprogramming.org/Perft#Perft_function
+ */
+u64 Board::perft(int depth) {
+    if (depth == 0)
+        return 1ULL;
+
+    u64 nodes = 0;
+    MoveGen mg(*this);
+    MoveList ml;
+    mg.generateAllMoves(&ml);
+    for(int i = 0; i < ml.count; i++) {
+        makeMove(ml.moves[i].move);
+        nodes += perft(depth-1);
+        takeMove();
+    }
+
+    return nodes;
 }
 
 int Board::sq120ToSq64[BRD_SQ_NUM];

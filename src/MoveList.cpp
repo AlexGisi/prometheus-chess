@@ -38,6 +38,6 @@ void MoveList::print() const {
     for(int i = 0; i < count; ++i) {
         mv = moves[i].move;
         score = moves[i].score;
-        printf("Move %d: %s (score: %d)\n", i+1, mv.toStr().c_str(), score);
+        printf("Move %d: %s (score: %d)\n", i+1, mv.to_str().c_str(), score);
     }
 }

@@ -28,7 +28,7 @@ public:
     bool capture() const;
     bool promotion() const;
 
-    std::string toStr() const;
+    std::string to_str() const;
 
     int move;
 };

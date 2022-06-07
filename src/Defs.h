@@ -11,6 +11,8 @@
 #define VERSION_MAJOR "0"
 #define VERSION_MINOR "1"
 
+typedef unsigned long long u64;
+
 #define BRD_SQ_NUM 120
 #define MAX_GAME_MOVES 2048
 #define MAX_POSITION_MOVES 256
