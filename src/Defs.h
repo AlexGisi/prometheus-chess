@@ -72,6 +72,8 @@ const int kiDir[8] = { -1, -10, 1, 10, -9, -11, 11, 9};
 #define MFLAGCAP 0x7C000
 #define MFLAGPROM 0xF00000
 
+#define NOMOVE 0
+
 // Is given piece a certain type.
 const int pieceKnight[13] = { false, false, true, false, false, false, false, false, true, false, false, false, false };
 const int pieceKing[13] = { false, false, false, false, false, false, true, false, false, false, false, false, true };

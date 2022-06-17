@@ -1,10 +1,11 @@
 #include <iostream>
-#include <sstream>
 #include "Board.h"
 #include "Defs.h"
 #include "PosKey.h"
 #include "Move.h"
 #include "MoveGen.h"
+
+#define fen1 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
 using namespace std;
 
@@ -15,13 +16,34 @@ void init() {
     PosKey::initHashKeys();
 }
 
-int main() {
-    init();
-
+void human() {
     Board b(START_FEN);
-    b.perft_suite(4);
+    std::string input;
+    bool q = false;
+    do {
+        b.print();
+        cout << "Enter move> ";
+        cin >> input;
 
-    return 0;
+        if(input == "q")
+            q = true;
+        else if(input == "t")
+            b.takeMove();
+        else {
+            try {
+                Move mv = b.getMove(input);
+                b.makeMove(mv);
+            } catch (std::invalid_argument& e) {
+                cout << "Move invalid";
+            }
+
+        }
+    } while(!q);
+}
+
+void perft() {
+    Board b(START_FEN);
+    b.perft_suite(3);
 }
 
 void basicTest() {
@@ -47,4 +69,12 @@ void basicTest() {
 
         getchar();
     }
+}
+
+int main() {
+    init();
+
+    human();
+
+    return 0;
 }

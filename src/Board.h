@@ -94,6 +94,7 @@ public:
     void movePiece(int from, int to);
     bool makeMove(Move& move);
     void takeMove();
+    Move getMove(std::string str);
 
     u64 perft(int depth);
     void perft_suite(int depth);
