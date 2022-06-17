@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cstdlib>
+#include <cassert>
 #include "Board.h"
 #include "MoveGen.h"
 #include "assertions.cpp"
