@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <chrono>
+#include "Defs.h"
 
 /*
  * Return functional components of a line in the perft results (.epd)
@@ -26,4 +28,12 @@ inline std::vector<std::string> parse_epd_line(const std::string& line) {
     }
 
     return res;
+}
+
+/*
+ * Ref: https://stackoverflow.com/a/56107709/5127535
+ */
+inline u64 get_time() {
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }

@@ -16,8 +16,12 @@ typedef unsigned long long u64;
 #define BRD_SQ_NUM 120
 #define MAX_GAME_MOVES 2048
 #define MAX_POSITION_MOVES 256
+#define MAX_DEPTH 64
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+#define INFINITE 30000
+#define MATE 29000
 
 // Useful for printing the board.
 const char pceChar[] = ".PNBRQKpnbrqk";

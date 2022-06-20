@@ -10,6 +10,7 @@
 #include "Defs.h"
 #include "PosKey.h"
 #include "Move.h"
+#include "PVTable.h"
 
 class Board {
 public:
@@ -26,6 +27,8 @@ public:
     static int sq64ToSq120[64];
     static int filesBrd[BRD_SQ_NUM];
     static int ranksBrd[BRD_SQ_NUM];
+    #define sq64(sq) Board::sq120ToSq64[sq]
+    #define sq120(sq) Board::sq64ToSq120[sq]
 
     static void initSq120To64();
     static void initFilesRanksBrd();
@@ -86,7 +89,13 @@ public:
     //
     int pceList[13][10];
 
+    PVTable pvTable;
+    Move pvArray[MAX_DEPTH];
     friend class PosKey;
+
+    // Arrays for move ordering.
+    int searchHistory[13][BRD_SQ_NUM];
+    int searchKillers[2][MAX_DEPTH];
 
     // Making moves.
     void clearPiece(int sq);
@@ -96,9 +105,13 @@ public:
     void takeMove();
     Move getMove(std::string str);
 
+    // Perft.
     u64 perft(int depth);
     void perft_suite(int depth);
     bool perft_eval_pos(int depth, const std::string& fen, const u64* correct);
+
+    // Principal variation.
+    int getPVLine(int depth);
 };
 
 

@@ -17,6 +17,7 @@ public:
 
     Move(const Move& rhs);
     Move& operator=(const Move& rhs);
+    bool operator==(const Move& rhs) const;
 
     int from() const;
     int to() const;

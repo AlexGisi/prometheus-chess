@@ -4,12 +4,10 @@
 
 #include <iostream>
 #include <cctype>
-#include <sstream>
-#include <exception>
 #include <iomanip>
 #include <fstream>
-#include <cstdlib>
 #include <cassert>
+#include <optional>
 #include "Board.h"
 #include "MoveGen.h"
 #include "assertions.cpp"
@@ -198,6 +196,7 @@ Board::Board(const Board &rhs) {
     }
 
     posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
 };
 
 Board &Board::operator=(const Board &rhs) {
@@ -241,6 +240,7 @@ Board &Board::operator=(const Board &rhs) {
     }
 
     posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
 
     return *this;
 }
@@ -893,8 +893,6 @@ Move Board::getMove(std::string str) {
     int from = FR2SQ(str[0] - 'a', str[1] - '1');
     int to = FR2SQ(str[2] - 'a', str[3] - '1');
 
-    printf("str: %s from:%d to:%d\n", str.c_str(), from, to);
-
     assert(sqOnBoard(from) && sqOnBoard(to));
 
     MoveList list;
@@ -919,6 +917,29 @@ Move Board::getMove(std::string str) {
         }
     }
     throw std::invalid_argument("Bad string input");
+}
+
+int Board::getPVLine(const int depth) {
+    assert(depth < MAX_DEPTH);
+
+    std::optional<Move> mv_opt = pvTable.probe(posKey);
+    int count = 0;
+    while (mv_opt && count < depth) {
+        assert(count < MAX_DEPTH);
+
+        if(MoveGen(*this).moveValid(mv_opt.value())) {
+            makeMove(mv_opt.value());
+            pvArray[count++] = mv_opt.value();
+        } else
+            break;
+
+        mv_opt = pvTable.probe(posKey);
+    }
+
+    while (ply > 0)
+        takeMove();
+
+    return count;
 }
 
 int Board::sq120ToSq64[BRD_SQ_NUM];

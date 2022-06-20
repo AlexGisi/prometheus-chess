@@ -14,6 +14,7 @@ class MoveGen {
 public:
     explicit MoveGen(const Board& b);
     void generateAllMoves(MoveList *list) const;
+    bool moveValid(const Move& move);
 
 private:
     static void addQuietMove(const Move& m, MoveList *list);
