@@ -8,12 +8,19 @@ A conventional chess engine.
 - Move representation
 - Move generation
 - Do/undo moves
+- Perft testing
+- Principal variation table
 
 # To-Do
-- Perft testing
-- Search
+- Move Search
 - UCI communication
-- Move search
+- Profiling
+- Hash table
+- Advanced position evaluation
+- Speed optimization
 
-# Acknowledgments
+# Ideas
+- Learn optimal piece-square tables
+
+# Acknowledgment
 The board representation and move generation code is largely a C++ adaptation of [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C" tutorial.

@@ -2,6 +2,7 @@
 // Created by Alex Gisi on 3/23/22.
 //
 
+#include <cassert>
 #include "MoveGen.h"
 #include "assertions.cpp"
 #include "iostream"
@@ -250,4 +251,24 @@ void MoveGen::addBlackPawnMove(int from, int to, MoveList *list) {
     } else {
         addQuietMove(Move(from, to, EMPTY, EMPTY, 0), list);
     }
+}
+
+/*
+ * Returns whether the move is possible for the current board.
+ */
+bool MoveGen::moveValid(const Move& move) {
+    MoveList ml;
+    generateAllMoves(&ml);
+
+    for(int i=0; i < ml.count; ++i) {
+        Move mv = ml.moves[i].move;
+        if (!board.makeMove(mv))
+            continue;
+        board.takeMove();
+
+        if (ml.moves[i].move == mv)
+            return true;
+    }
+
+    return false;
 }

@@ -4,6 +4,10 @@
 #include "PosKey.h"
 #include "Move.h"
 #include "MoveGen.h"
+#include "search.cpp"
+
+#define fen1 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+#define mate_in_3 "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
 
 using namespace std;
 
@@ -14,14 +18,54 @@ void init() {
     PosKey::initHashKeys();
 }
 
-int main() {
-    init();
+void human() {
+    int pv_num = 0;
+    int max = 0;
 
-    Board board(START_FEN);
-    u64 n = board.perft(4);
-    cout << "perft: " << n << endl;
+    Board b(mate_in_3);
+    MoveList ml;
+    SearchInfo info;
 
-    return 0;
+    std::string input;
+    bool q = false;
+    do {
+        b.print();
+        cout << "Enter move> ";
+        cin >> input;
+
+        if(input == "q")
+            q = true;
+        else if(input == "t")
+            b.takeMove();
+        else if(input == "p") {
+            max = b.getPVLine(4);
+            printf("PvLine of %d moves: ", max);
+            for(pv_num = 0; pv_num < max; pv_num++) {
+                Move mv = b.pvArray[pv_num];
+                printf(" %s", mv.to_str().c_str());
+            }
+            cout << endl;
+        }
+        else if(input == "s") {
+            info.depth = 4;
+            search(b, info);
+        }
+        else {
+            try {
+                Move mv = b.getMove(input);
+                b.pvTable.store(b.posKey, mv);
+                b.makeMove(mv);
+            } catch (std::invalid_argument& e) {
+                cout << "Move invalid" << endl;
+            }
+
+        }
+    } while(!q);
+}
+
+void perft() {
+    Board b(START_FEN);
+    b.perft_suite(4);
 }
 
 void basicTest() {
@@ -47,4 +91,12 @@ void basicTest() {
 
         getchar();
     }
+}
+
+int main() {
+    init();
+
+    human();
+
+    return 0;
 }

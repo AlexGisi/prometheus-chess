@@ -4,12 +4,14 @@
 
 #include <iostream>
 #include <cctype>
-#include <sstream>
-#include <exception>
 #include <iomanip>
+#include <fstream>
+#include <cassert>
+#include <optional>
 #include "Board.h"
 #include "MoveGen.h"
 #include "assertions.cpp"
+#include "util.cpp"
 
 Board::Board() {
     setUpEmpty();
@@ -55,95 +57,7 @@ void Board::setUpEmpty() {
     posKey = PosKey(this);
 }
 
-// TODO
-Board::Board(const Board &rhs) {
-    setUpEmpty();
-
-    for(int i=0; i < BRD_SQ_NUM; ++i)
-        pieces[i] = rhs.pieces[i];
-
-    for(int i=0; i < 3; ++i)
-        pawns[i] = rhs.pawns[i];
-
-    kingSq[0] = rhs.kingSq[0];
-    kingSq[1] = rhs.kingSq[1];
-
-    side = rhs.side;
-    enPas = rhs.enPas;
-    fiftyMove = rhs.fiftyMove;
-
-    ply = rhs.ply;
-    hisPly = rhs.hisPly;
-
-    for(int i=0; i < 13; ++i)
-        pceNum[i] = rhs.pceNum[i];
-
-    for(int i=0; i < 2; ++i) {
-        bigPce[i] = rhs.bigPce[i];
-        majPce[i] = rhs.majPce[i];
-        minPce[i] = rhs.minPce[i];
-        material[i] = rhs.material[i];
-    }
-
-    castlePerm = rhs.castlePerm;
-
-    for(int i=0; i < 13; ++i) {
-        for(int j=0; j < 10; ++j)
-            pceList[i][j] = rhs.pceList[i][j];
-    }
-
-    posKey = rhs.posKey;
-};
-
-Board &Board::operator=(const Board &rhs) {
-    // This self-assignment check is considered bad design.
-    if(&rhs == this)
-        return *this;
-
-    setUpEmpty();
-
-    for(int i=0; i < BRD_SQ_NUM; ++i)
-        pieces[i] = rhs.pieces[i];
-
-    for(int i=0; i < 3; ++i)
-        pawns[i] = rhs.pawns[i];
-
-    kingSq[0] = rhs.kingSq[0];
-    kingSq[1] = rhs.kingSq[1];
-
-    side = rhs.side;
-    enPas = rhs.enPas;
-    fiftyMove = rhs.fiftyMove;
-
-    ply = rhs.ply;
-    hisPly = rhs.hisPly;
-
-    for(int i=0; i < 13; ++i)
-        pceNum[i] = rhs.pceNum[i];
-
-    for(int i=0; i < 2; ++i) {
-        bigPce[i] = rhs.bigPce[i];
-        majPce[i] = rhs.majPce[i];
-        minPce[i] = rhs.minPce[i];
-        material[i] = rhs.material[i];
-    }
-
-    castlePerm = rhs.castlePerm;
-
-    for(int i=0; i < 13; ++i) {
-        for(int j=0; j < 10; ++j)
-            pceList[i][j] = rhs.pceList[i][j];
-    }
-
-    posKey = rhs.posKey;
-
-    return *this;
-}
-
-// Not robust to incorrect fen strings.
-Board::Board(const std::string& fen) {
-    setUpEmpty();
-
+void Board::setUp(const std::string& fen) {
     int rank = RANK_8;
     int file = FILE_A;
     int piece = 0;
@@ -243,6 +157,98 @@ Board::Board(const std::string& fen) {
     // Other initialization.
     posKey = PosKey(this);
     updateListsMaterial();
+}
+
+Board::Board(const Board &rhs) {
+    setUpEmpty();
+
+    for(int i=0; i < BRD_SQ_NUM; ++i)
+        pieces[i] = rhs.pieces[i];
+
+    for(int i=0; i < 3; ++i)
+        pawns[i] = rhs.pawns[i];
+
+    kingSq[0] = rhs.kingSq[0];
+    kingSq[1] = rhs.kingSq[1];
+
+    side = rhs.side;
+    enPas = rhs.enPas;
+    fiftyMove = rhs.fiftyMove;
+
+    ply = rhs.ply;
+    hisPly = rhs.hisPly;
+
+    for(int i=0; i < 13; ++i)
+        pceNum[i] = rhs.pceNum[i];
+
+    for(int i=0; i < 2; ++i) {
+        bigPce[i] = rhs.bigPce[i];
+        majPce[i] = rhs.majPce[i];
+        minPce[i] = rhs.minPce[i];
+        material[i] = rhs.material[i];
+    }
+
+    castlePerm = rhs.castlePerm;
+
+    for(int i=0; i < 13; ++i) {
+        for(int j=0; j < 10; ++j)
+            pceList[i][j] = rhs.pceList[i][j];
+    }
+
+    posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
+};
+
+Board &Board::operator=(const Board &rhs) {
+    // This self-assignment check is considered bad design.
+    if(&rhs == this)
+        return *this;
+
+    setUpEmpty();
+
+    for(int i=0; i < BRD_SQ_NUM; ++i)
+        pieces[i] = rhs.pieces[i];
+
+    for(int i=0; i < 3; ++i)
+        pawns[i] = rhs.pawns[i];
+
+    kingSq[0] = rhs.kingSq[0];
+    kingSq[1] = rhs.kingSq[1];
+
+    side = rhs.side;
+    enPas = rhs.enPas;
+    fiftyMove = rhs.fiftyMove;
+
+    ply = rhs.ply;
+    hisPly = rhs.hisPly;
+
+    for(int i=0; i < 13; ++i)
+        pceNum[i] = rhs.pceNum[i];
+
+    for(int i=0; i < 2; ++i) {
+        bigPce[i] = rhs.bigPce[i];
+        majPce[i] = rhs.majPce[i];
+        minPce[i] = rhs.minPce[i];
+        material[i] = rhs.material[i];
+    }
+
+    castlePerm = rhs.castlePerm;
+
+    for(int i=0; i < 13; ++i) {
+        for(int j=0; j < 10; ++j)
+            pceList[i][j] = rhs.pceList[i][j];
+    }
+
+    posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
+
+    return *this;
+}
+
+// Not robust to incorrect fen strings.
+Board::Board(const std::string& fen) {
+    setUpEmpty();
+    setUp(fen);
 }
 
 void Board::initSq120To64() {
@@ -601,7 +607,7 @@ void Board::addPiece(const int sq, const int pce) {
         else
             minPce[col]++;
     } else {
-        pawns[col].setBit(sq120ToSq64[sq]); // TODO: sq is 120, right?
+        pawns[col].setBit(sq120ToSq64[sq]);
         pawns[BOTH].setBit(sq120ToSq64[sq]);
     }
     material[col] += pieceVal[pce];
@@ -696,7 +702,7 @@ bool Board::makeMove(Move& move) {
     fiftyMove++;
 
     int cap = move.captured();
-    if(cap != EMPTY) {
+    if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
         clearPiece(to);
         fiftyMove = 0;
@@ -797,7 +803,7 @@ void Board::takeMove() {
         kingSq[side] = from;
 
     int cap = move.captured();
-    if(cap != EMPTY) {
+    if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
         addPiece(to, cap);
     }
@@ -833,6 +839,107 @@ u64 Board::perft(int depth) {
     }
 
     return nodes;
+}
+
+/*
+ * Assert agreement of move generation with pre-specified perft figures supplied by
+ * perftsuite.epd, a list of challenging move generation positions.
+ * The path to perftsuite.epd specified in Defs.h.
+ */
+void Board::perft_suite(int depth) {
+    std::ifstream infile(PERFTRESULTSPATH);
+    std::string line;
+    u64 correct[6];
+    int line_num = 1;
+    int pass_num = 0;
+
+    std::cout << "Perft suite to depth " << depth << " (pass/fail - result - correct)" << std::endl;
+    while(std::getline(infile, line)) {
+        std::vector<std::string> l = parse_epd_line(line);
+        std::string fen = l[0];
+        for(int i=0; i < 6; i++)
+            correct[i] = std::stoull(l[i+1]);
+
+        std::cout << line_num << ": ";
+        if (perft_eval_pos(depth, fen, correct))
+            pass_num++;
+        line_num++;
+    }
+    std::cout << '\n' << "Passed " << pass_num << '/' << "126" << std::endl;
+}
+
+bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct) {
+    if (depth < 1 || depth > 6) throw std::invalid_argument("Depth should be between one and six.");
+
+    setUpEmpty();
+    setUp(fen);
+    u64 res = perft(depth);
+
+    bool pass = (res == correct[depth-1]);
+    if (pass)
+        std::cout << "PASS - ";
+    else
+        std::cout << "FAIL - ";
+    std::cout << res << " - " << correct[depth-1] << std::endl;
+
+    return pass;
+}
+
+Move Board::getMove(std::string str) {
+    if (str[1] > '8' || str[1] < '1' || str[3] > '8' || str[3] < '1' || str[0] > 'h'
+    || str[0] < 'a' || str[2] > 'h' || str[2] < 'a' || str.length() < 4 || str.length() > 6)
+        throw std::invalid_argument("Bad string input");
+
+    int from = FR2SQ(str[0] - 'a', str[1] - '1');
+    int to = FR2SQ(str[2] - 'a', str[3] - '1');
+
+    assert(sqOnBoard(from) && sqOnBoard(to));
+
+    MoveList list;
+    MoveGen mg(*this);
+    mg.generateAllMoves(&list);
+    for (int i=0; i < list.count; i++) {
+        Move m = list.moves[i].move;
+        if(m.from() == from && m.to() == to) {
+            int pro = m.promoted();
+            if(pro != EMPTY) {
+                if(isRQ(pro) && !isBQ(pro) && str[4] == 'r')
+                    return m;
+                else if(!isRQ(pro) && isBQ(pro) && str[4] == 'b')
+                    return m;
+                else if(isRQ(pro) && isBQ(pro) && str[4] == 'q')
+                    return m;
+                else if(isKn(pro) && str[4] == 'n')
+                    return m;
+                continue;
+            }
+            return m;
+        }
+    }
+    throw std::invalid_argument("Bad string input");
+}
+
+int Board::getPVLine(const int depth) {
+    assert(depth < MAX_DEPTH);
+
+    std::optional<Move> mv_opt = pvTable.probe(posKey);
+    int count = 0;
+    while (mv_opt && count < depth) {
+        assert(count < MAX_DEPTH);
+
+        if(MoveGen(*this).moveValid(mv_opt.value())) {
+            makeMove(mv_opt.value());
+            pvArray[count++] = mv_opt.value();
+        } else
+            break;
+
+        mv_opt = pvTable.probe(posKey);
+    }
+
+    while (ply > 0)
+        takeMove();
+
+    return count;
 }
 
 int Board::sq120ToSq64[BRD_SQ_NUM];
