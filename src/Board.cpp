@@ -4,12 +4,10 @@
 
 #include <iostream>
 #include <cctype>
-#include <sstream>
-#include <exception>
 #include <iomanip>
 #include <fstream>
-#include <cstdlib>
 #include <cassert>
+#include <optional>
 #include "Board.h"
 #include "MoveGen.h"
 #include "assertions.cpp"
@@ -198,6 +196,7 @@ Board::Board(const Board &rhs) {
     }
 
     posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
 };
 
 Board &Board::operator=(const Board &rhs) {
@@ -241,6 +240,7 @@ Board &Board::operator=(const Board &rhs) {
     }
 
     posKey = rhs.posKey;
+    pvTable = rhs.pvTable;
 
     return *this;
 }
@@ -883,6 +883,63 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct
     std::cout << res << " - " << correct[depth-1] << std::endl;
 
     return pass;
+}
+
+Move Board::getMove(std::string str) {
+    if (str[1] > '8' || str[1] < '1' || str[3] > '8' || str[3] < '1' || str[0] > 'h'
+    || str[0] < 'a' || str[2] > 'h' || str[2] < 'a' || str.length() < 4 || str.length() > 6)
+        throw std::invalid_argument("Bad string input");
+
+    int from = FR2SQ(str[0] - 'a', str[1] - '1');
+    int to = FR2SQ(str[2] - 'a', str[3] - '1');
+
+    assert(sqOnBoard(from) && sqOnBoard(to));
+
+    MoveList list;
+    MoveGen mg(*this);
+    mg.generateAllMoves(&list);
+    for (int i=0; i < list.count; i++) {
+        Move m = list.moves[i].move;
+        if(m.from() == from && m.to() == to) {
+            int pro = m.promoted();
+            if(pro != EMPTY) {
+                if(isRQ(pro) && !isBQ(pro) && str[4] == 'r')
+                    return m;
+                else if(!isRQ(pro) && isBQ(pro) && str[4] == 'b')
+                    return m;
+                else if(isRQ(pro) && isBQ(pro) && str[4] == 'q')
+                    return m;
+                else if(isKn(pro) && str[4] == 'n')
+                    return m;
+                continue;
+            }
+            return m;
+        }
+    }
+    throw std::invalid_argument("Bad string input");
+}
+
+int Board::getPVLine(const int depth) {
+    assert(depth < MAX_DEPTH);
+
+    std::optional<Move> mv_opt = pvTable.probe(posKey);
+    int count = 0;
+    while (mv_opt && count < depth) {
+        assert(count < MAX_DEPTH);
+
+        if(MoveGen(*this).moveValid(mv_opt.value())) {
+            makeMove(mv_opt.value());
+            pvArray[count++] = mv_opt.value();
+        } else
+            break;
+
+        mv_opt = pvTable.probe(posKey);
+    }
+
+    while (ply > 0)
+        takeMove();
+
+    return count;
 }
 
 int Board::sq120ToSq64[BRD_SQ_NUM];

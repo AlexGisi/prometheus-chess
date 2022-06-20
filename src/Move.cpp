@@ -101,3 +101,7 @@ std::string Move::to_str() const {
 
     return s;
 }
+
+bool Move::operator==(const Move &rhs) const {
+    return move == rhs.move;
+}
