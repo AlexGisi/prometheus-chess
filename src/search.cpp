@@ -2,6 +2,7 @@
 // Created by Alex Gisi on 6/18/22.
 //
 
+#include <cassert>
 #include "Board.h"
 #include "util.cpp"
 #include "evaluation.cpp"
