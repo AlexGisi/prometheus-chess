@@ -2,6 +2,7 @@
 // Created by Alex Gisi on 6/19/22.
 //
 
+#include <cassert>
 #include <climits>
 #include "PVTable.h"
 
