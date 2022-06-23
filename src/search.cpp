@@ -67,6 +67,25 @@ inline void prepSearch(Board& board, SearchInfo& info) {
     info.fhf = 0;
 }
 
+/*
+ * Searching from the index move_idx, switch the move at move_idx with the best
+ * move in ml.
+ */
+inline void pickNextMove(int move_idx, MoveList& ml) {
+    SearchMove temp;
+    int best_score = 0;
+    int best_idx = move_idx;
+
+    for(int i=move_idx; i < ml.count; i++) {
+        if(ml.moves[i].score > best_score) {
+            best_score = ml.moves[i].score;
+            best_idx = i;
+        }
+    }
+    temp = ml.moves[move_idx];
+    ml.moves[move_idx] = ml.moves[best_idx];
+    ml.moves[best_idx] = temp;
+}
 inline int quiescence(int alpha, int beta, Board& board, SearchInfo* info) {
     return 0;
 }
@@ -95,6 +114,8 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
     int score = -INFINITE;
 
     for(int i = 0; i < ml.count; i++) {
+        pickNextMove(i, ml);
+
         if(!board.makeMove(ml.moves[i].move))
             continue;
 

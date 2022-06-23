@@ -26,7 +26,7 @@ void MoveGen::addCaptureMove(const Move& m, MoveList *list) {
     assert(pieceValid(m.captured()));
 
     list->moves[list->count].move = m;
-    list->moves[list->count].score = 0;
+    list->moves[list->count].score = mvvLvaScores[m.captured()][board.pieces[m.from()]];
     list->count++;
 }
 
@@ -35,11 +35,11 @@ void MoveGen::addEnPassantMove(const Move& m, MoveList *list) {
     assert(sqOnBoard(m.to()));
 
     list->moves[list->count].move = m;
-    list->moves[list->count].score = 0;
+    list->moves[list->count].score = 105;
     list->count++;
 }
 
-void MoveGen::generateAllMoves(MoveList *list) const {
+void MoveGen::generateAllMoves(MoveList *list) {
     assert(board.checkBoard());
 
     list->count = 0;
@@ -70,9 +70,9 @@ void MoveGen::generateAllMoves(MoveList *list) const {
             // En passant captures.
             if(board.enPas != NO_SQ) {
                 if(sq+9 == board.enPas)
-                    addCaptureMove(Move(sq, sq+9, board.pieces[sq-1], EMPTY, MFLAGEP), list);
+                    addEnPassantMove(Move(sq, sq+9, board.pieces[sq-1], EMPTY, MFLAGEP), list);
                 if(sq+11 == board.enPas)
-                    addCaptureMove(Move(sq, sq+11, board.pieces[sq+1], EMPTY, MFLAGEP), list);
+                    addEnPassantMove(Move(sq, sq+11, board.pieces[sq+1], EMPTY, MFLAGEP), list);
             }
         }
 
@@ -113,9 +113,9 @@ void MoveGen::generateAllMoves(MoveList *list) const {
             // En passant captures.
             if(board.enPas != NO_SQ) {
                 if(sq-9 == board.enPas)
-                    addCaptureMove(Move(sq, sq-9, board.pieces[sq+1], EMPTY, MFLAGEP), list);
+                    addEnPassantMove(Move(sq, sq-9, board.pieces[sq+1], EMPTY, MFLAGEP), list);
                 if(sq-11 == board.enPas)
-                    addCaptureMove(Move(sq, sq-11, board.pieces[sq-1], EMPTY, MFLAGEP), list);
+                    addEnPassantMove(Move(sq, sq-11, board.pieces[sq-1], EMPTY, MFLAGEP), list);
             }
         }
 
@@ -272,3 +272,14 @@ bool MoveGen::moveValid(const Move& move) {
 
     return false;
 }
+
+int MoveGen::initMvvLva() {
+    for(int attacker = wP; attacker <= bK; ++attacker) {
+        for(int victim = wP; victim <= bK; ++victim)
+            mvvLvaScores[victim][attacker] = victimScore[victim] + 6 - (victimScore[attacker] / 100);
+    }
+
+    return 0;
+}
+
+int MoveGen::mvvLvaScores[13][13];

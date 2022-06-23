@@ -13,16 +13,22 @@
 class MoveGen {
 public:
     explicit MoveGen(const Board& b);
-    void generateAllMoves(MoveList *list) const;
+    void generateAllMoves(MoveList *list);
     bool moveValid(const Move& move);
+
+    static int initMvvLva();
+
+    // Move ordering -- most valuable victim, least valuable attacker.
+    constexpr static int victimScore[13] = { 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600 };
+    static int mvvLvaScores[13][13];
 
 private:
     static void addQuietMove(const Move& m, MoveList *list);
-    static void addCaptureMove(const Move& m, MoveList *list);
+    void addCaptureMove(const Move& m, MoveList *list);
     static void addEnPassantMove(const Move& m, MoveList *list);
 
-    static void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
-    static void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
+    void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
+    void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
 
     static void addWhitePawnMove(int from, int to, MoveList *list);
     static void addBlackPawnMove(int from, int to, MoveList *list);
