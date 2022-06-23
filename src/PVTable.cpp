@@ -11,14 +11,9 @@
  */
 PVTable::PVTable(int size) {
     entries = ( size / (int) sizeof(PVEntry) ) - 2;  // Subtract two to avoid any out-of-bounds.
-    table = new PVEntry[size / (int) sizeof(PVEntry)];
+    table = std::make_unique<PVEntry[]>(size / (int) sizeof(PVEntry));
 
     clear();
-}
-
-PVTable::~PVTable() {
-    clear();
-    delete[] table;
 }
 
 void PVTable::clear() {
@@ -28,7 +23,7 @@ void PVTable::clear() {
 
 PVTable::PVTable(const PVTable &rhs) {
     entries = rhs.entries;
-    table = new PVEntry[rhs.entries+2];
+    table = std::make_unique<PVEntry[]>(rhs.entries);
     clear();
 
     for(int i=0; i < entries; i++) {
@@ -42,7 +37,7 @@ PVTable& PVTable::operator=(const PVTable &rhs) {
         return *this;
 
     entries = rhs.entries;
-    table = new PVEntry[rhs.entries+2];
+    table = std::make_unique<PVEntry[]>(rhs.entries);
 
     for(int i=0; i < entries; i++) {
         table[i] = rhs.table[i];

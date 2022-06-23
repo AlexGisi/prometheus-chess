@@ -6,6 +6,7 @@
 #define BLUE_PVTABLE_H
 
 #include <optional>
+#include <memory>
 #include "Defs.h"
 #include "Move.h"
 #include "PosKey.h"
@@ -26,7 +27,6 @@ public:
     };
 
     explicit PVTable(int size = 0x100000 * 2);
-    ~PVTable();
 
     PVTable(const PVTable& rhs);
     PVTable& operator=(const PVTable& rhs);
@@ -36,7 +36,7 @@ public:
     std::optional<Move> probe(const PosKey& key);
 
 private:
-    PVEntry* table;
+    std::unique_ptr<PVEntry[]> table;
     int entries;
 };
 
