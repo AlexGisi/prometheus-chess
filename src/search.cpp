@@ -105,7 +105,7 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
         return eval(board);
 
     MoveList ml;
-    MoveGen mg(board);
+    MoveGen mg(&board);
     mg.generateAllMoves(&ml);
 
     int legal = 0;

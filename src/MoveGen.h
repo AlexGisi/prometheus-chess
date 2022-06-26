@@ -12,7 +12,7 @@
 
 class MoveGen {
 public:
-    explicit MoveGen(const Board& b);
+    explicit MoveGen(Board* b);
     void generateAllMoves(MoveList *list);
     bool moveValid(const Move& move);
 
@@ -61,7 +61,7 @@ private:
             0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8
     };
 
-    Board board;
+    Board* board;
 };
 
 

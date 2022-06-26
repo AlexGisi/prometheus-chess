@@ -828,7 +828,7 @@ u64 Board::perft(int depth) {
         return 1ULL;
 
     u64 nodes = 0;
-    MoveGen mg(*this);
+    MoveGen mg(this);
     MoveList ml;
     mg.generateAllMoves(&ml);
     for(int i = 0; i < ml.count; i++) {
@@ -896,7 +896,7 @@ Move Board::getMove(std::string str) {
     assert(sqOnBoard(from) && sqOnBoard(to));
 
     MoveList list;
-    MoveGen mg(*this);
+    MoveGen mg(this);
     mg.generateAllMoves(&list);
     for (int i=0; i < list.count; i++) {
         Move m = list.moves[i].move;
@@ -927,7 +927,7 @@ int Board::getPVLine(const int depth) {
     while (mv_opt && count < depth) {
         assert(count < MAX_DEPTH);
 
-        if(MoveGen(*this).moveValid(mv_opt.value())) {
+        if(MoveGen(this).moveValid(mv_opt.value())) {
             makeMove(mv_opt.value());
             pvArray[count++] = mv_opt.value();
         } else

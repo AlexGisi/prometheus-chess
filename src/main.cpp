@@ -73,7 +73,7 @@ void perft() {
 void basicTest() {
     Board board(START_FEN);
     MoveList ml;
-    MoveGen mg(board);
+    MoveGen mg(&board);
     mg.generateAllMoves(&ml);
 
     int mvNum = 0;
