@@ -23,15 +23,15 @@ public:
     static int mvvLvaScores[13][13];
 
 private:
-    static void addQuietMove(const Move& m, MoveList *list);
+    void addQuietMove(const Move& m, MoveList *list);
     void addCaptureMove(const Move& m, MoveList *list);
     static void addEnPassantMove(const Move& m, MoveList *list);
 
     void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
     void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
 
-    static void addWhitePawnMove(int from, int to, MoveList *list);
-    static void addBlackPawnMove(int from, int to, MoveList *list);
+    void addWhitePawnMove(int from, int to, MoveList *list);
+    void addBlackPawnMove(int from, int to, MoveList *list);
 
     const int loopSlidePce[8] = { wB, wR, wQ, 0, bB, bR, bQ, 0 };
     int loopSlideIdx[2] = { 0, 4 };  // Index the above array by side.

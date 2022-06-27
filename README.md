@@ -10,9 +10,9 @@ A conventional chess engine.
 - Do/undo moves
 - Perft testing
 - Principal variation table
+- Move Search
 
 # To-Do
-- Move Search
 - UCI communication
 - Profiling
 - Hash table
@@ -23,4 +23,4 @@ A conventional chess engine.
 - Learn optimal piece-square tables
 
 # Acknowledgment
-The board representation and move generation code is largely a C++ adaptation of [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C" tutorial.
+The board representation and move generation adapts to C++ [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C".

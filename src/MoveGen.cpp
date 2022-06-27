@@ -16,7 +16,15 @@ void MoveGen::addQuietMove(const Move& m, MoveList *list) {
     assert(sqOnBoard(m.to()));
 
     list->moves[list->count].move = m;
-    list->moves[list->count].score = 0;
+
+    if(board->searchKillers[0][board->ply] == m) {
+        list->moves[list->count].score = 900000;
+    } else if(board->searchKillers[1][board->ply] == m) {
+        list->moves[list->count].score = 800000;
+    } else {
+        list->moves[list->count].score = board->searchHistory[board->pieces[m.from()]][m.to()];
+    }
+
     list->count++;
 }
 
@@ -26,7 +34,7 @@ void MoveGen::addCaptureMove(const Move& m, MoveList *list) {
     assert(pieceValid(m.captured()));
 
     list->moves[list->count].move = m;
-    list->moves[list->count].score = mvvLvaScores[m.captured()][board->pieces[m.from()]];
+    list->moves[list->count].score = mvvLvaScores[m.captured()][board->pieces[m.from()]] + 1000000;
     list->count++;
 }
 
@@ -35,7 +43,7 @@ void MoveGen::addEnPassantMove(const Move& m, MoveList *list) {
     assert(sqOnBoard(m.to()));
 
     list->moves[list->count].move = m;
-    list->moves[list->count].score = 105;
+    list->moves[list->count].score = 105 + 1000000;
     list->count++;
 }
 

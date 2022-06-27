@@ -48,13 +48,13 @@ inline bool hasRepetition(Board& board) {
 
 inline void prepSearch(Board& board, SearchInfo& info) {
     for(auto & i : board.searchHistory) {
-        for(int & j : i)
+        for(auto & j : i)
             j = 0;
     }
 
     for(auto & i : board.searchKillers) {
         for(auto & j : i)
-            j = 0;
+            j = Move();
     }
 
     board.pvTable.clear();
@@ -112,6 +112,17 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
     int old_alpha = alpha;
     Move best_move;
     int score = -INFINITE;
+    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+
+    // Ensure we search the PV line first.
+    if(pv_move) {
+        for(int i = 0; i < ml.count; i++) {
+            if(ml.moves[i].move == pv_move.value()) {
+                ml.moves[i].score = 2000000;
+                break;
+            }
+        }
+    }
 
     for(int i = 0; i < ml.count; i++) {
         pickNextMove(i, ml);
@@ -128,10 +139,20 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
                 if(legal == 1)
                     info.fhf++;
                 info.fh++;
+
+                if(!ml.moves[i].move.capture()) {
+                    board.searchKillers[1][board.ply] = board.searchKillers[0][board.ply];
+                    board.searchKillers[0][board.ply] = ml.moves[i].move;
+                }
+
                 return beta;
             }
             alpha = score;
             best_move = ml.moves[i].move;
+
+            if(!ml.moves[i].move.capture()) {
+                board.searchHistory[board.pieces[best_move.from()]][best_move.to()] += depth;
+            }
         }
     }
 

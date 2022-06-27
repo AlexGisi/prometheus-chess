@@ -95,7 +95,7 @@ public:
 
     // Arrays for move ordering.
     int searchHistory[13][BRD_SQ_NUM];
-    int searchKillers[2][MAX_DEPTH];
+    Move searchKillers[2][MAX_DEPTH];
 
     // Making moves.
     void clearPiece(int sq);
