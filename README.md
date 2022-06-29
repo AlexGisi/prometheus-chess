@@ -15,6 +15,7 @@ A conventional chess engine.
 # To-Do
 - UCI communication
 - Profiling
+- Improve quiescence
 - Hash table
 - Advanced position evaluation
 - Speed optimization

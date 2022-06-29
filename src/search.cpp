@@ -30,8 +30,9 @@ typedef struct {
 /*
  * Check if search time up or interrupt from GUI.
  */
-inline void checkInterrupt() {
-
+inline void checkInterrupt(SearchInfo& info) {
+    if(info.time_set == true && get_time() > info.stop_time)
+        info.stopped = true;
 }
 
 /*
@@ -86,17 +87,83 @@ inline void pickNextMove(int move_idx, MoveList& ml) {
     ml.moves[move_idx] = ml.moves[best_idx];
     ml.moves[best_idx] = temp;
 }
-inline int quiescence(int alpha, int beta, Board& board, SearchInfo* info) {
-    return 0;
+
+/*
+ * Search just until a quiet position, avoiding the horizon effect.
+ * TODO: consider other factors.
+ */
+inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
+    assert(board.checkBoard());
+
+    if(info.nodes % 2048 == 0 )
+        checkInterrupt(info);
+
+    info.nodes++;
+
+    if(board.ply > MAX_DEPTH - 1)
+        return eval(board);
+
+    int score = eval(board);
+
+    if(score >= beta)
+        return beta;
+
+    if(score > alpha)
+        alpha = score;
+
+    MoveList ml;
+    MoveGen mg(&board);
+    mg.generateAllCaps(&ml);
+
+    int legal = 0;
+    int old_alpha = alpha;
+    Move best_move;
+    score = -INFINITE;
+    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+
+    for(int i = 0; i < ml.count; i++) {
+        pickNextMove(i, ml);
+
+        if(!board.makeMove(ml.moves[i].move))
+            continue;
+
+        legal++;
+        score = -quiescence(-beta, -alpha, board, info);
+        board.takeMove();
+
+        if(info.stopped)
+            return 0;
+
+        if(score > alpha) {
+            if(score >= beta) {
+                if(legal == 1)
+                    info.fhf++;
+                info.fh++;
+
+                return beta;
+            }
+            alpha = score;
+            best_move = ml.moves[i].move;
+        }
+    }
+
+    if(alpha != old_alpha)
+        board.pvTable.store(board.posKey, best_move);
+
+    return alpha;
 }
 
 inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& info, int doNull) {
     assert(board.checkBoard());
 
-    info.nodes++;
     if(depth == 0) {
-        return eval(board);
+        return quiescence(alpha, beta, board, info);
     }
+
+    if(info.nodes % 2048 == 0 )
+        checkInterrupt(info);
+
+    info.nodes++;
 
     if(hasRepetition(board) || board.fiftyMove >= 100)
         return 0;
@@ -133,6 +200,9 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
         legal++;
         score = -alphaBeta(-beta, -alpha, depth-1, board, info, true);
         board.takeMove();
+
+        if(info.stopped)
+            return 0;
 
         if(score > alpha) {
             if(score >= beta) {
@@ -184,7 +254,8 @@ inline void search(Board& board, SearchInfo& info) {
     for(current_depth = 1; current_depth <= info.depth; ++current_depth) {
         best_score = alphaBeta(-INFINITE, INFINITE, current_depth, board, info, true);
 
-        // Out of time?
+        if(info.stopped)
+            break;
 
         pv_moves = board.getPVLine(current_depth);
         best_move = board.pvArray[0];

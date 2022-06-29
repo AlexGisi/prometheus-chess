@@ -203,6 +203,117 @@ void MoveGen::generateAllMoves(MoveList *list) {
     }
 }
 
+/*
+ * TODO: Make more efficient/better?
+ */
+void MoveGen::generateAllCaps(MoveList *list) {
+    assert(board->checkBoard());
+
+    list->count = 0;
+
+    int pce = EMPTY;
+    int side = board->side;
+    int sq = 0, t_sq = 0, pceNum = 0;
+    int dir = 0, index = 0, pceIndex = 0;
+
+    if(side == WHITE) {
+        for(pceNum = 0; pceNum < board->pceNum[wP]; ++pceNum) {
+            sq = board->pceList[wP][pceNum];
+            assert(sqOnBoard(sq));
+
+            // Pawns.
+            // Generate captures.
+            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+9]]==BLACK)
+                addWhitePawnCapMove(sq, sq+9, board->pieces[sq+9], list);
+            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+11]]==BLACK)
+                addWhitePawnCapMove(sq, sq+11, board->pieces[sq+11], list);
+            // En passant captures.
+            if(board->enPas != NO_SQ) {
+                if(sq+9 == board->enPas)
+                    addEnPassantMove(Move(sq, sq+9, board->pieces[sq-1], EMPTY, MFLAGEP), list);
+                if(sq+11 == board->enPas)
+                    addEnPassantMove(Move(sq, sq+11, board->pieces[sq+1], EMPTY, MFLAGEP), list);
+            }
+        }
+    } else {
+        for(pceNum = 0; pceNum < board->pceNum[bP]; ++pceNum) {
+            sq = board->pceList[bP][pceNum];
+            assert(sqOnBoard(sq));
+
+            // Pawns.
+            // Generate captures.
+            if(!sqOffBoard(sq-9) && pieceCol[board->pieces[sq-9]] == WHITE)
+                addBlackPawnCapMove(sq, sq-9, board->pieces[sq-9], list);
+            if(!sqOffBoard(sq-11) && pieceCol[board->pieces[sq-11]] == WHITE)
+                addBlackPawnCapMove(sq, sq-11, board->pieces[sq-11], list);
+
+            // En passant captures.
+            if(board->enPas != NO_SQ) {
+                if(sq-9 == board->enPas)
+                    addEnPassantMove(Move(sq, sq-9, board->pieces[sq+1], EMPTY, MFLAGEP), list);
+                if(sq-11 == board->enPas)
+                    addEnPassantMove(Move(sq, sq-11, board->pieces[sq-1], EMPTY, MFLAGEP), list);
+            }
+        }
+    }
+
+    // Loop for slide pieces.
+    pceIndex = loopSlideIdx[side];
+    pce = loopSlidePce[pceIndex];
+    while(pce != 0) {
+        assert(pieceValid(pce));
+        pce = loopSlidePce[pceIndex++];
+
+        for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
+            sq = board->pceList[pce][pceNum];
+            assert(sqOnBoard(sq));
+
+            for(index = 0; index < numDir[pce]; ++index) {
+                dir = pceDir[pce][index];
+                t_sq = sq + dir;
+
+                while(!sqOffBoard(t_sq)) {
+                    if(board->pieces[t_sq] != EMPTY) {
+                        if(pieceCol[board->pieces[t_sq]] == !side)
+                            addCaptureMove(Move(sq, t_sq, board->pieces[t_sq], EMPTY, 0), list);
+                        break;
+                    }
+                    t_sq += dir;
+                }
+            }
+        }
+    }
+
+    // Loop for non-slide pieces.
+    pceIndex = loopNonSlideIdx[side];
+    pce = loopNonSlidePce[pceIndex++];
+    while(pce != 0) {
+        assert(pieceValid(pce));
+
+        for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
+            sq = board->pceList[pce][pceNum];
+            assert(sqOnBoard(sq));
+
+            for(index = 0; index < numDir[pce]; ++index) {
+                dir = pceDir[pce][index];
+                t_sq = sq + dir;
+
+                if(sqOffBoard(t_sq))
+                    continue;
+
+                if(board->pieces[t_sq] != EMPTY) {
+                    if(pieceCol[board->pieces[t_sq]] == !side) {
+                        addCaptureMove(Move(sq, t_sq, board->pieces[t_sq], EMPTY, 0), list);
+                    }
+                    continue;
+                }
+            }
+        }
+
+        pce = loopNonSlidePce[pceIndex++];
+    }
+}
+
 void MoveGen::addWhitePawnCapMove(int from, int to, int cap, MoveList *list) {
     assert(pieceValidEmpty(cap));
     assert(sqOnBoard(from));

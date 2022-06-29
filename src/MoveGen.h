@@ -14,6 +14,7 @@ class MoveGen {
 public:
     explicit MoveGen(Board* b);
     void generateAllMoves(MoveList *list);
+    void generateAllCaps(MoveList *list);
     bool moveValid(const Move& move);
 
     static int initMvvLva();

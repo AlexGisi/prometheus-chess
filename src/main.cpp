@@ -49,7 +49,7 @@ void human() {
             cout << endl;
         }
         else if(input == "s") {
-            info.depth = 8;
+            info.depth = 6;
             search(b, info);
         }
         else {
