@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 3/15/22.
 //
 
-#ifndef BLUE_MOVE_H
-#define BLUE_MOVE_H
+#ifndef ATHENE_MOVE_H
+#define ATHENE_MOVE_H
 
 #include <string>
 #include "Defs.h"
@@ -40,4 +40,4 @@ typedef struct {
 } SearchMove;
 
 
-#endif //BLUE_MOVE_H
+#endif //ATHENE_MOVE_H

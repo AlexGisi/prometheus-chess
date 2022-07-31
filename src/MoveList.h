@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 3/24/22.
 //
 
-#ifndef BLUE_MOVELIST_H
-#define BLUE_MOVELIST_H
+#ifndef ATHENE_MOVELIST_H
+#define ATHENE_MOVELIST_H
 
 #include "Move.h"
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //BLUE_MOVELIST_H
+#endif //ATHENE_MOVELIST_H

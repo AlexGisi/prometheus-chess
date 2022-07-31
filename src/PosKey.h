@@ -4,8 +4,8 @@
 // https://www.youtube.com/watch?v=WqVwQBXLwE0&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=12
 //
 
-#ifndef BLUE_POSKEY_H
-#define BLUE_POSKEY_H
+#ifndef ATHENE_POSKEY_H
+#define ATHENE_POSKEY_H
 
 
 #include <cstdint>
@@ -41,4 +41,4 @@ private:
 };
 
 
-#endif //BLUE_POSKEY_H
+#endif //ATHENE_POSKEY_H

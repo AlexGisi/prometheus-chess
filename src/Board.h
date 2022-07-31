@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 2/17/22.
 //
 
-#ifndef BLUE_BOARD_H
-#define BLUE_BOARD_H
+#ifndef ATHENE_BOARD_H
+#define ATHENE_BOARD_H
 
 #include <string>
 #include "BitBoard.h"
@@ -115,4 +115,4 @@ public:
 };
 
 
-#endif //BLUE_BOARD_H
+#endif //ATHENE_BOARD_H

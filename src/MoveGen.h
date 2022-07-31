@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 3/23/22.
 //
 
-#ifndef BLUE_MOVEGEN_H
-#define BLUE_MOVEGEN_H
+#ifndef ATHENE_MOVEGEN_H
+#define ATHENE_MOVEGEN_H
 
 #include <vector>
 #include "Board.h"
@@ -66,4 +66,4 @@ private:
 };
 
 
-#endif //BLUE_MOVEGEN_H
+#endif //ATHENE_MOVEGEN_H

@@ -32,7 +32,7 @@
 *.out
 *.app
 *.cbp
-blue
+athene
 
 # CMake
 CMakeLists.txt.user

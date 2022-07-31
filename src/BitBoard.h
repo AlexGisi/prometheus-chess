@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 2/17/22.
 //
 
-#ifndef BLUE_BITBOARD_H
-#define BLUE_BITBOARD_H
+#ifndef ATHENE_BITBOARD_H
+#define ATHENE_BITBOARD_H
 
 #include <cstdint>
 
@@ -36,4 +36,4 @@ private:
 };
 
 
-#endif //BLUE_BITBOARD_H
+#endif //ATHENE_BITBOARD_H

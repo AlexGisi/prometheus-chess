@@ -2,8 +2,8 @@
 // Created by Alex Gisi on 6/19/22.
 //
 
-#ifndef BLUE_PVTABLE_H
-#define BLUE_PVTABLE_H
+#ifndef ATHENE_PVTABLE_H
+#define ATHENE_PVTABLE_H
 
 #include <optional>
 #include <memory>
@@ -41,4 +41,4 @@ private:
 };
 
 
-#endif //BLUE_PVTABLE_H
+#endif //ATHENE_PVTABLE_H

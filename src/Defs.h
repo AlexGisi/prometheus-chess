@@ -4,10 +4,10 @@
 // https://www.youtube.com/watch?v=x9sPmLt-EBM&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=3
 //
 
-#ifndef BLUE_DEFS_H
-#define BLUE_DEFS_H
+#ifndef ATHENE_DEFS_H
+#define ATHENE_DEFS_H
 
-#define NAME "blue"
+#define NAME "athene"
 #define VERSION_MAJOR "0"
 #define VERSION_MINOR "1"
 #define AUTHOR "Alex Gisi"
@@ -113,4 +113,4 @@ const int castlePermArr[120] = {
 /* FILES */
 #define PERFTRESULTSPATH "../test/perftsuite.epd"
 
-#endif //BLUE_DEFS_H
+#endif //ATHENE_DEFS_H

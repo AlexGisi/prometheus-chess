@@ -1,4 +1,4 @@
-# blue-chess
+# athene
 A conventional chess engine.
 
 # Complete
