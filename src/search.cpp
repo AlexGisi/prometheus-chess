@@ -47,6 +47,9 @@ inline bool hasRepetition(Board& board) {
     return false;
 }
 
+/*
+ * Does everything but set the start time of the search.
+ */
 inline void prepSearch(Board& board, SearchInfo& info) {
     for(auto & i : board.searchHistory) {
         for(auto & j : i)
@@ -61,7 +64,6 @@ inline void prepSearch(Board& board, SearchInfo& info) {
     board.pvTable.clear();
     board.ply = 0;
 
-    info.start_time = get_time();
     info.stopped = false;
     info.nodes = 0;
     info.fh = 0;
@@ -260,15 +262,14 @@ inline void search(Board& board, SearchInfo& info) {
         pv_moves = board.getPVLine(current_depth);
         best_move = board.pvArray[0];
 
-        // DEBUG
-        printf("Depth:%d score:%d move:%s nodes:%llu ",
-               current_depth, best_score, best_move.to_str().c_str(), info.nodes);
-        printf("PV:");
+        printf("info score cp %d depth %d nodes %llu time %llu ",
+               best_score, current_depth, info.nodes, get_time()-info.start_time);
+        printf("pv");
         for(pv_num = 0; pv_num < pv_moves; pv_num++) {
-            Move mv = board.pvArray[pv_num];
-            printf(" %s", mv.to_str().c_str());
+            printf(" %s", board.pvArray[pv_num].to_str().c_str());
         }
         printf("\n");
-        printf("Ordering:%.2f\n", info.fhf / info.fh);
+        // printf("Ordering:%.2f\n", info.fhf / info.fh);
     }
+    printf("bestmove %s\n", best_move.to_str().c_str());
 }

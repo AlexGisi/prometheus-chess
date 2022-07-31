@@ -70,6 +70,7 @@ void Board::setUp(const std::string& fen) {
 
     ss >> std::noskipws;  // By default, >> skips white space, so change that.
 
+    setUpEmpty();
     // Piece placement.
     while ((ss >> c) && !std::isspace(c)) {
         count = 1;
@@ -157,6 +158,8 @@ void Board::setUp(const std::string& fen) {
     // Other initialization.
     posKey = PosKey(this);
     updateListsMaterial();
+
+    assert(checkBoard());
 }
 
 Board::Board(const Board &rhs) {
@@ -885,6 +888,11 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct
     return pass;
 }
 
+/*
+ * It may seem strange to parse a string into a move in the board class, but it
+ * makes identifying the move easier, and we can correctly tag it as en passant
+ * and the like.
+ */
 Move Board::getMove(std::string str) {
     if (str[1] > '8' || str[1] < '1' || str[3] > '8' || str[3] < '1' || str[0] > 'h'
     || str[0] < 'a' || str[2] > 'h' || str[2] < 'a' || str.length() < 4 || str.length() > 6)
