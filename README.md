@@ -24,4 +24,4 @@ A conventional chess engine.
 - Learn optimal piece-square tables
 
 # Acknowledgment
-The board representation and move generation adapts to C++ [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C".
+The board representation and move generation adapts [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C".
