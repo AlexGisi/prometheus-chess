@@ -2,6 +2,7 @@
 // Created by Alex Gisi on 6/18/22.
 //
 
+#include <iostream>
 #include <cassert>
 #include "Board.h"
 #include "util.cpp"
@@ -268,8 +269,9 @@ inline void search(Board& board, SearchInfo& info) {
         for(pv_num = 0; pv_num < pv_moves; pv_num++) {
             printf(" %s", board.pvArray[pv_num].to_str().c_str());
         }
-        printf("\n");
+        std::cout << std::endl;
         // printf("Ordering:%.2f\n", info.fhf / info.fh);
     }
-    printf("bestmove %s\n", best_move.to_str().c_str());
+    // printf("bestmove %s\n", best_move.to_str().c_str());
+    std::cout << "bestmove " << best_move.to_str() << std::endl;
 }

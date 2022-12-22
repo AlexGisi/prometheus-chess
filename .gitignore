@@ -51,3 +51,6 @@ _deps
 cmake-build-debug/*
 
 test/
+dist/
+
+.DS_STORE

@@ -39,11 +39,14 @@ void uci_loop() {
         else if (token == "isready")
             std::cout << "readyok" << std::endl;
         else if (token == "position")
-            uci_parse_pos(board, is);
-        else if (token == "ucinewgame")
-            uci_parse_pos(board, (std::istringstream &) "position startpos\n");
+            uci_parse_pos(board, std::move(is));
+        else if (token == "ucinewgame") {
+            std::string POSITION_STARTPOS = "startpos";
+            std::istringstream isng(POSITION_STARTPOS);
+            uci_parse_pos(board, std::move(isng));
+        }
         else if (token == "go")
-            uci_parse_go(board, is, info);
+            uci_parse_go(board, std::move(is), info);
         else if (token == "stop")
             info.stopped = true;
         else if (token == "quit")
@@ -51,7 +54,7 @@ void uci_loop() {
         } while (!quit);
 }
 
-void uci_parse_go(Board &board, std::istringstream &is, SearchInfo &info) {
+void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
     std::string token;
     int depth = -1, movestogo = 30, movetime = -1;
     int time = -1, inc = 0;
@@ -106,13 +109,14 @@ void uci_parse_go(Board &board, std::istringstream &is, SearchInfo &info) {
     if (depth == -1)
         info.depth = MAX_DEPTH;
 
-    printf("time:%d start:%llu stop:%llu depth:%d timeset:%d\n",
+    printf("time:%d start:%llu stop:%llu depth:%d timeset:%d",
            time,info.start_time,info.stop_time,info.depth,info.time_set);
+    std::cout << std::endl;
 
     std::thread (search, std::ref(board), std::ref(info)).detach();
 }
 
-void uci_parse_pos(Board &board, std::istringstream &is) {
+void uci_parse_pos(Board &board, std::istringstream is) {
     Move m;
     std::string token, fen;
 
