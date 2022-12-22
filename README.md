@@ -1,5 +1,5 @@
 # athene
-A conventional chess engine.
+Athene is the ancient Greek goddess of wisdom and warfare.
 
 # Complete
 - Board representation
@@ -11,9 +11,9 @@ A conventional chess engine.
 - Perft testing
 - Principal variation table
 - Move Search
+- UCI communication
 
 # To-Do
-- UCI communication
 - Profiling
 - Improve quiescence
 - Hash table
