@@ -4,6 +4,8 @@
 // https://www.youtube.com/watch?v=x9sPmLt-EBM&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=3
 //
 
+#include <array>
+
 #ifndef ATHENE_DEFS_H
 #define ATHENE_DEFS_H
 
@@ -112,5 +114,7 @@ const int castlePermArr[120] = {
 
 /* FILES */
 #define PERFTRESULTSPATH "../test/perftsuite.epd"
+
+const std::array<int, 64> ZERO_PST = { 0 };
 
 #endif //ATHENE_DEFS_H

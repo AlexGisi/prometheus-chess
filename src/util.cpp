@@ -2,10 +2,16 @@
 // Created by Alex Gisi on 6/7/22.
 //
 
-#include <string>
+#include <ios>
 #include <vector>
+#include <string>
 #include <sstream>
 #include <chrono>
+#include <array>
+#include <optional>
+#include <stdexcept>
+#include <fstream>
+#include "util.h"
 #include "Defs.h"
 
 /*
@@ -14,7 +20,7 @@
  *
  * Ref: https://stackoverflow.com/questions/10058606/splitting-a-string-by-a-character
  */
-inline std::vector<std::string> parse_epd_line(const std::string& line) {
+std::vector<std::string> parse_epd_line(const std::string& line) {
     std::stringstream ss(line);
     std::string segment;
     std::vector<std::string> res;
@@ -33,7 +39,40 @@ inline std::vector<std::string> parse_epd_line(const std::string& line) {
 /*
  * Ref: https://stackoverflow.com/a/56107709/5127535
  */
-inline u64 get_time() {
+u64 get_time() {
     using namespace std::chrono;
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+
+void readTable(std::fstream & infile, std::optional<std::array<int, 64>> & table) {
+    table = ZERO_PST;
+    std::string tok;
+    for (int i=0; i < 64; i++) {
+        infile >> tok;
+        table->at(i) = std::stoi(tok);
+    }
+}
+
+OptionalPieceSquareTables get_psts(std::string file_name) {
+    std::fstream infile;
+    std::string token;
+    OptionalPieceSquareTables ret;
+
+    infile.open(file_name, std::ios::in);
+    if(infile.is_open()) {
+        while(infile >> token) {
+            if (token == "pawns")
+                readTable(infile, ret.pawns);
+            else if (token == "knights")
+                readTable(infile, ret.knights);
+            else if (token == "bishops")
+                readTable(infile, ret.bishops);
+            else if (token == "rooks")
+                readTable(infile, ret.rooks);
+        }
+    } else {
+        throw std::runtime_error("Could not open PieceSquareTable file.");
+    }
+
+    return ret;
 }

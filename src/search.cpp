@@ -5,8 +5,8 @@
 #include <iostream>
 #include <cassert>
 #include "Board.h"
-#include "util.cpp"
-#include "evaluation.cpp"
+#include "util.h"
+#include "evaluation.h"
 #include "MoveGen.h"
 #include "MoveList.h"
 
