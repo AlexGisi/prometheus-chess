@@ -32,7 +32,7 @@ void uci_loop() {
         is >> std::skipws >> token;
 
         if (token == "uci") {
-            std::cout << "id name " << NAME << std::endl;
+            std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
             std::cout << "uciok" << std::endl;
         }
