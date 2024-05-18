@@ -7,7 +7,7 @@
 #ifndef ATHENE_DEFS_H
 #define ATHENE_DEFS_H
 
-#define NAME "athene"
+#define NAME "prometheus"
 #define VERSION_MAJOR "0"
 #define VERSION_MINOR "1"
 #define AUTHOR "Alex Gisi"
