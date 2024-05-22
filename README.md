@@ -6,6 +6,14 @@
 
 Promestheus is a conventional chess engine. 
 
+# Build
+You can build prometheus on your machine using cmake. From the repo's root directory:
+```
+cmake -DCMAKE_BUILD_TYPE=Release -S . -B build-dir/
+cmake --build build-dir/
+```
+Then the executable is located at `build-dir/prometheus`.
+
 # Complete
 - Board representation
 - Board setup/FEN parsing
