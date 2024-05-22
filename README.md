@@ -14,6 +14,9 @@ cmake --build build-dir/
 ```
 Then the executable is located at `build-dir/prometheus`.
 
+# Play
+prometheus has a bot account on lichess: https://lichess.org/@/prometheus-bot
+
 # Complete
 - Board representation
 - Board setup/FEN parsing
