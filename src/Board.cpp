@@ -11,7 +11,7 @@
 #include "Board.h"
 #include "MoveGen.h"
 #include "assertions.cpp"
-#include "util.h"
+#include "util.cpp"
 
 Board::Board() {
     setUpEmpty();

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include "Board.h"
 #include "Defs.h"
 #include "PosKey.h"
@@ -7,8 +6,6 @@
 #include "MoveGen.h"
 #include "search.cpp"
 #include "uci.h"
-#include "evaluation.h"
-#include "optional"
 
 #define fen1 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 #define mate_in_3 "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
@@ -16,13 +13,12 @@
 
 using namespace std;
 
-void init(std::optional<std::string> pst_file_name) {
+void init() {
     Board::initSq120To64();
     Board::initFilesRanksBrd();
     BitBoard::initBitMasks();
     PosKey::initHashKeys();
     MoveGen::initMvvLva();
-    PieceSquareTables::initPieceSquareTables(pst_file_name);
 }
 
 void human() {
@@ -100,13 +96,8 @@ void basicTest() {
     }
 }
 
-int main(int argc, char * argv[]) {
-    std::optional<std::string> pst_file;
-    if(argc == 2) {
-        pst_file = argv[1];
-    }
-
-    init(pst_file);
+int main() {
+    init();
     uci_loop();
 
     return 0;

@@ -34,12 +34,17 @@ void uci_loop() {
         if (token == "uci") {
             std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
+
+            // todo: list options
+
             std::cout << "uciok" << std::endl;
         }
         else if (token == "isready")
             std::cout << "readyok" << std::endl;
         else if (token == "position")
             uci_parse_pos(board, std::move(is));
+        else if (token == "setoption")
+            ;
         else if (token == "ucinewgame") {
             std::string POSITION_STARTPOS = "startpos";
             std::istringstream isng(POSITION_STARTPOS);
@@ -79,15 +84,15 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
         }
         else if (token == "movestogo") {
             is >> token;
-            movestogo = std::stoi(token);
+            movestogo = std::stoi(token); // moves until next time control
         }
         else if (token == "movetime") {
             is >> token;
-            movetime = std::stoi(token);
+            movetime = std::stoi(token); // search exactly movetime seconds
         }
         else if (token == "depth") {
             is >> token;
-            depth = std::stoi(token);
+            depth = std::stoi(token); // search only up to depth plies
         }
     }
 
