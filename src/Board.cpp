@@ -849,8 +849,8 @@ u64 Board::perft(int depth) {
  * perftsuite.epd, a list of challenging move generation positions.
  * The path to perftsuite.epd specified in Defs.h.
  */
-void Board::perft_suite(int depth) {
-    std::ifstream infile(PERFTRESULTSPATH);
+void Board::perft_suite(int depth, const std::string& resultsfile) {
+    std::ifstream infile(resultsfile);
     std::string line;
     u64 correct[6];
     int line_num = 1;

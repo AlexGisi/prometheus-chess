@@ -21,84 +21,33 @@ void init() {
     MoveGen::initMvvLva();
 }
 
-void human() {
-    int pv_num = 0;
-    int max = 0;
-
-    Board b(w);
-    MoveList ml;
-    SearchInfo info;
-
-    std::string input;
-    bool q = false;
-    do {
-        b.print();
-        cout << "Enter move> ";
-        cin >> input;
-
-        if(input == "q")
-            q = true;
-        else if(input == "t")
-            b.takeMove();
-        else if(input == "p") {
-            max = b.getPVLine(4);
-            printf("PvLine of %d moves: ", max);
-            for(pv_num = 0; pv_num < max; pv_num++) {
-                Move mv = b.pvArray[pv_num];
-                printf(" %s", mv.to_str().c_str());
-            }
-            cout << endl;
-        }
-        else if(input == "s") {
-            info.depth = 6;
-            search(b, info);
-        }
-        else {
-            try {
-                Move mv = b.getMove(input);
-                b.pvTable.store(b.posKey, mv);
-                b.makeMove(mv);
-            } catch (std::invalid_argument& e) {
-                cout << "Move invalid" << endl;
-            }
-
-        }
-    } while(!q);
-}
-
-void perft() {
-    Board b(START_FEN);
-    b.perft_suite(4);
-}
-
-void basicTest() {
-    Board board(START_FEN);
-    MoveList ml;
-    MoveGen mg(&board);
-    mg.generateAllMoves(&ml);
-
-    int mvNum = 0;
-    Move mv;
-
-    for(mvNum = 0; mvNum < ml.count; ++mvNum) {
-        mv = ml.moves[mvNum].move;
-
-        if (!board.makeMove(mv))
-            continue;
-
-        std::cout << "Made: " << mv.to_str() << std::endl;
-        board.print();
-        board.takeMove();
-        std::cout << "Taken: " << mv.to_str() << std::endl;
-        board.print();
-
-        getchar();
+void perft(int depth, const string& resultsfile) {
+    if (depth > 6) {
+        cout << "perft depth must be <= 6" << endl;
+        return;
     }
+    Board b(START_FEN);
+    b.perft_suite(depth, resultsfile);
 }
 
-int main() {
+int main(int argc, char** argv) {
     init();
-    uci_loop();
-
+    if (argc > 1) {
+        string subcommand = argv[1];
+        if (subcommand == "perft") {
+            if (argc == 4) {
+                string depth = argv[2];
+                string resultsfile = argv[3];
+                perft(std::stoi(depth), resultsfile);
+            } else {
+                cout << "usage: perft [depth] [resultsfile]" << endl;
+                return -1;
+            }
+        } else {
+            cout << "subcommands: perft" << endl;
+        }
+    } else {
+        uci_loop();
+    }
     return 0;
 }

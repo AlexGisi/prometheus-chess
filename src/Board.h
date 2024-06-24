@@ -107,7 +107,7 @@ public:
 
     // Perft.
     u64 perft(int depth);
-    void perft_suite(int depth);
+    void perft_suite(int depth, const std::string& resultsfile);
     bool perft_eval_pos(int depth, const std::string& fen, const u64* correct);
 
     // Principal variation.

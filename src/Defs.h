@@ -110,7 +110,4 @@ const int castlePermArr[120] = {
 #define isKn(p) (pieceKnight[(p)])
 #define isKi(p) (pieceKing[(p)])
 
-/* FILES */
-#define PERFTRESULTSPATH "../test/perftsuite.epd"
-
 #endif //ATHENE_DEFS_H
