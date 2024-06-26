@@ -27,7 +27,7 @@ MoveList &MoveList::operator=(const MoveList &rhs) {
     return *this;
 }
 
-MoveList::~MoveList() = default;  // TODO: Needs non-trivial destructor?
+MoveList::~MoveList() = default;
 
 
 void MoveList::print() const {

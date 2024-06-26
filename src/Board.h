@@ -45,9 +45,10 @@ public:
     [[nodiscard]] std::string to_str() const;
     void print() const;
 
+    // Assign a piece (could be EMPTY) to every square on the 120-piece board.
     int pieces[BRD_SQ_NUM];
-    BitBoard pawns[3];  // WHITE, BLACK, BOTH.
 
+    BitBoard pawns[3];  // WHITE, BLACK, BOTH.
     int kingSq[2];
 
     int side;

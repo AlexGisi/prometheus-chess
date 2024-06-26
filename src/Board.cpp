@@ -625,7 +625,7 @@ void Board::movePiece(const int from, const int to) {
     int pce = pieces[from];
     int col = pieceCol[pce];
 
-    int t_pieceNum = false; // TODO: remove
+    int t_pieceNum = false;
 
     posKey.hashPce(pce, from);
     pieces[from] = EMPTY;
@@ -643,7 +643,7 @@ void Board::movePiece(const int from, const int to) {
     for(idx = 0; idx < pceNum[pce]; ++idx) {
         if(pceList[pce][idx] == from) {
             pceList[pce][idx] = to;
-            t_pieceNum = true;  // TODO: remove debug
+            t_pieceNum = true;
             break;
         }
     }
@@ -738,7 +738,6 @@ bool Board::makeMove(Move& move) {
         addPiece(to, pro);
     }
 
-    // TODO: remove debug
     if(pieceKing[pieces[to]]) {
         kingSq[side] = to;
     }
