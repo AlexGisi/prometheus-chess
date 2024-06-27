@@ -35,3 +35,4 @@ current_datetime=$(date +"%Y-%m-%d_%H-%M-%S")
   -concurrency 8
 
 rm config.json
+rm log.txt

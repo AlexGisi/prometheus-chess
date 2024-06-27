@@ -1,0 +1,10 @@
+An informal results log, tabulated by commit hash
+
+4b2468488d3dd9b00d497482a9e22d5281fff739
+--------------------------------------------------
+Results of prometheus vs vice (2+0.1, 1t, MB - 64MB, Balsa_270423.pgn):
+Elo: -381.70 +/- 105.01, nElo: -545.10 +/- 68.10
+LOS: 0.00 %, DrawRatio: 10.00 %, PairsRatio: -nan
+Games: 100, Wins: 5, Losses: 85, Draws: 10, Points: 10.0 (10.00 %)
+Ptnml(0-2): [0, 0, 0, 0, 0]
+--------------------------------------------------
