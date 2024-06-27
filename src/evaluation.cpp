@@ -75,56 +75,56 @@ inline int eval(const Board& board) {
     pce = wP;
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score += pawnTable[sq64(sq)];
     }
 
     pce = bP;
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score -= pawnTable[mirror64[sq64(sq)]];
     }
 
     pce = wN;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score += knightTable[sq64(sq)];
     }	
 
     pce = bN;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score -= knightTable[mirror64[sq64(sq)]];
     }			
 	
     pce = wB;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score += bishopTable[sq64(sq)];
     }	
 
     pce = bB;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score -= bishopTable[mirror64[sq64(sq)]];
     }	
 
     pce = wR;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score += rookTable[sq64(sq)];
     }	
 
     pce = bR;	
     for(pce_num = 0; pce_num < board.pceNum[pce]; ++pce_num) {
         sq = board.pceList[pce][pce_num];
-        assert(sqOnBoard(sq));
+        assert(Board::is_on_board(sq));
         score -= rookTable[mirror64[sq64(sq)]];
     }	
 

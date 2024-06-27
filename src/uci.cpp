@@ -11,6 +11,7 @@
 #include "Board.h"
 #include "search.cpp"
 #include "uci.h"
+#include "Move.h"
 
 /*
  * The main I/O loop for gameplay with the UCI protocol.
@@ -135,11 +136,11 @@ void uci_parse_pos(Board &board, std::istringstream is) {
     } else
         return;
 
-    board.setUp(fen);
+    board.initialize(fen);
 
     while (is >> token) {
-        m = board.getMove(token);
-        board.makeMove(m);
+        m = Move::from_str(token, board);
+        board.make_move(m);
         board.ply = 0;
     }
 }

@@ -6,15 +6,18 @@
 #define ATHENE_MOVEGEN_H
 
 #include <vector>
-#include "Board.h"
+#include "Defs.h"
 #include "Move.h"
-#include "MoveList.h"
+
+class Board;
+
+using MoveListPtr = std::shared_ptr<std::vector<SearchMove>>;
 
 class MoveGen {
 public:
     explicit MoveGen(Board* b);
-    void generateAllMoves(MoveList *list);
-    void generateAllCaps(MoveList *list);
+    MoveListPtr generateAllMoves();
+    MoveListPtr generateAllCaps();
     bool moveValid(const Move& move);
 
     static int initMvvLva();
@@ -24,15 +27,15 @@ public:
     static int mvvLvaScores[13][13];
 
 private:
-    void addQuietMove(const Move& m, MoveList *list);
-    void addCaptureMove(const Move& m, MoveList *list);
-    static void addEnPassantMove(const Move& m, MoveList *list);
+    void addQuietMove(const Move& m, const MoveListPtr& list);
+    void addCaptureMove(const Move& m, const MoveListPtr& list);
+    static void addEnPassantMove(const Move& m, const MoveListPtr& list);
 
-    void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
-    void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
+    void addWhitePawnCapMove(int from, int to, int cap, const MoveListPtr& list);
+    void addBlackPawnCapMove(int from, int to, int cap, const MoveListPtr& list);
 
-    void addWhitePawnMove(int from, int to, MoveList *list);
-    void addBlackPawnMove(int from, int to, MoveList *list);
+    void addWhitePawnMove(int from, int to, const MoveListPtr& list);
+    void addBlackPawnMove(int from, int to, const MoveListPtr& list);
 
     const int loopSlidePce[8] = { wB, wR, wQ, 0, bB, bR, bQ, 0 };
     int loopSlideIdx[2] = { 0, 4 };  // Index the above array by side.

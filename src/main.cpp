@@ -14,8 +14,7 @@
 using namespace std;
 
 void init() {
-    Board::initSq120To64();
-    Board::initFilesRanksBrd();
+    Board::initialize_lookup_tables();
     BitBoard::initBitMasks();
     PosKey::initHashKeys();
     MoveGen::initMvvLva();

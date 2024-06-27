@@ -14,10 +14,10 @@
 #include "util.cpp"
 
 Board::Board() {
-    setUpEmpty();
+    initialize();
 };
 
-void Board::setUpEmpty() {
+void Board::initialize() {
     for(int & piece : pieces)
         piece = OFFBOARD;
 
@@ -57,7 +57,7 @@ void Board::setUpEmpty() {
     posKey = PosKey(this);
 }
 
-void Board::setUp(const std::string& fen) {
+void Board::initialize(const std::string& fen) {
     int rank = RANK_8;
     int file = FILE_A;
     int piece = 0;
@@ -70,7 +70,7 @@ void Board::setUp(const std::string& fen) {
 
     ss >> std::noskipws;  // By default, >> skips white space, so change that.
 
-    setUpEmpty();
+    initialize();
     // Piece placement.
     while ((ss >> c) && !std::isspace(c)) {
         count = 1;
@@ -157,13 +157,42 @@ void Board::setUp(const std::string& fen) {
 
     // Other initialization.
     posKey = PosKey(this);
-    updateListsMaterial();
 
-    assert(checkBoard());
+    // Set material-tracking arrays.
+    int sq, col, idx;
+    for(idx = 0; idx < BRD_SQ_NUM; ++idx) {
+        sq = idx;
+        piece = pieces[idx];
+        if(piece != OFFBOARD && piece != EMPTY) {
+            col = pieceCol[piece];
+
+            if(pieceBig[piece]) bigPce[col]++;
+            if(pieceMin[piece]) minPce[col]++;
+            if(pieceMaj[piece]) majPce[col]++;
+
+            material[col] += pieceVal[piece];
+
+            pceList[piece][pceNum[piece]] = sq;
+            pceNum[piece]++;
+
+            if(piece == wK) kingSq[WHITE] = sq;
+            if(piece == bK) kingSq[BLACK] = sq;
+
+            if(piece == wP) {
+                pawns[WHITE].setBit(sq120ToSq64[sq]);
+                pawns[BOTH].setBit(sq120ToSq64[sq]);
+            } else if(piece == bP) {
+                pawns[BLACK].setBit(sq120ToSq64[sq]);
+                pawns[BOTH].setBit(sq120ToSq64[sq]);
+            }
+        }
+    }
+
+    assert(check_board());
 }
 
 Board::Board(const Board &rhs) {
-    setUpEmpty();
+    initialize();
 
     for(int i=0; i < BRD_SQ_NUM; ++i)
         pieces[i] = rhs.pieces[i];
@@ -207,7 +236,7 @@ Board &Board::operator=(const Board &rhs) {
     if(&rhs == this)
         return *this;
 
-    setUpEmpty();
+    initialize();
 
     for(int i=0; i < BRD_SQ_NUM; ++i)
         pieces[i] = rhs.pieces[i];
@@ -250,11 +279,12 @@ Board &Board::operator=(const Board &rhs) {
 
 // Not robust to incorrect fen strings.
 Board::Board(const std::string& fen) {
-    setUpEmpty();
-    setUp(fen);
+    initialize();
+    initialize(fen);
 }
 
-void Board::initSq120To64() {
+void Board::initialize_lookup_tables() {
+    // Square conversion tables.
     int index = 0;
     int file = FILE_A;
     int rank = RANK_1;
@@ -274,6 +304,26 @@ void Board::initSq120To64() {
             sq64ToSq120[sq64] = sq120;
             sq120ToSq64[sq120] = sq64;
             sq64++;
+        }
+    }
+
+    // File and rank tables.
+    int idx = 0;
+    file = FILE_A;
+    rank = RANK_1;
+    int sq = A1;
+    sq64 = 0;
+
+    for(idx = 0; idx < BRD_SQ_NUM; ++idx) {
+        filesBrd[idx] = OFFBOARD;
+        ranksBrd[idx] = OFFBOARD;
+    }
+
+    for(rank = RANK_1; rank <= RANK_8; ++rank) {
+        for(file = FILE_A; file <= FILE_H; ++file) {
+            sq = FR2SQ(file, rank);
+            filesBrd[sq] = file;
+            ranksBrd[sq] = rank;
         }
     }
 }
@@ -319,61 +369,9 @@ std::string Board::to_str() const {
     return ss.str();
 }
 
-void Board::updateListsMaterial() {
-    int piece, sq, col, idx;
-    for(idx = 0; idx < BRD_SQ_NUM; ++idx) {
-        sq = idx;
-        piece = pieces[idx];
-        if(piece != OFFBOARD && piece != EMPTY) {
-            col = pieceCol[piece];
-
-            if(pieceBig[piece]) bigPce[col]++;
-            if(pieceMin[piece]) minPce[col]++;
-            if(pieceMaj[piece]) majPce[col]++;
-
-            material[col] += pieceVal[piece];
-
-            pceList[piece][pceNum[piece]] = sq;
-            pceNum[piece]++;
-
-            if(piece == wK) kingSq[WHITE] = sq;
-            if(piece == bK) kingSq[BLACK] = sq;
-
-            if(piece == wP) {
-                pawns[WHITE].setBit(sq120ToSq64[sq]);
-                pawns[BOTH].setBit(sq120ToSq64[sq]);
-            } else if(piece == bP) {
-                pawns[BLACK].setBit(sq120ToSq64[sq]);
-                pawns[BOTH].setBit(sq120ToSq64[sq]);
-            }
-        }
-    }
-}
-
-void Board::initFilesRanksBrd() {
-    int idx = 0;
-    int file = FILE_A;
-    int rank = RANK_1;
-    int sq = A1;
-    int sq64 = 0;
-
-    for(idx = 0; idx < BRD_SQ_NUM; ++idx) {
-        filesBrd[idx] = OFFBOARD;
-        ranksBrd[idx] = OFFBOARD;
-    }
-
-    for(rank = RANK_1; rank <= RANK_8; ++rank) {
-        for(file = FILE_A; file <= FILE_H; ++file) {
-            sq = FR2SQ(file, rank);
-            filesBrd[sq] = file;
-            ranksBrd[sq] = rank;
-        }
-    }
-}
-
 // Asserts accuracy of board-tracking arrays. Useful after series of captures or undoes.
 // Always returns true or throws an error.
-bool Board::checkBoard() const {
+bool Board::check_board() const {
     // Temporary arrays.
     int t_pceNum[13] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     int t_bigPce[2] = { 0, 0 };
@@ -453,10 +451,10 @@ bool Board::checkBoard() const {
 }
 
 // Determine if a square is attacked by a side.
-bool Board::sqAttacked(const int sq, const int att_side) const {
-    assert(sqOnBoard(sq));
+bool Board::sq_attacked(const int sq, const int att_side) const {
+    assert(is_on_board(sq));
     assert(sideValid(side));
-    assert(checkBoard());
+    assert(check_board());
 
     int pce, idx, t_sq, dir = 0;
 
@@ -519,16 +517,16 @@ bool Board::sqAttacked(const int sq, const int att_side) const {
 }
 
 // Testing function for sqAttacked.
-void Board::showSqAttBySide(int att_side) const {
+void Board::print_squares_attacked(int att_side) const {
     int rank = 0;
     int file = 0;
     int sq = 0;
 
-    printf("\n\nSquares attacked by:%c\n", sideChar[att_side]);
+    printf("\n\nSquares attacked by:%c\n", sideChar[side]);
     for(rank = RANK_8; rank >= RANK_1; --rank) {
         for(file = FILE_A; file <= FILE_H; ++file) {
             sq = FR2SQ(file,rank);
-            if(sqAttacked(sq, att_side)) {
+            if(sq_attacked(sq, side)) {
                 printf("X");
             } else {
                 printf("-");
@@ -540,7 +538,7 @@ void Board::showSqAttBySide(int att_side) const {
     printf("\n\n");
 }
 
-std::string Board::sqToStr(const int sq) {
+std::string Board::sq_to_str(const int sq) {
     std::string s1;
     std::string s2;
 
@@ -550,11 +548,26 @@ std::string Board::sqToStr(const int sq) {
     return s1 + s2;
 }
 
+void Board::prep_search() {
+    for(auto & i : searchHistory) {
+        for(auto & j : i)
+            j = 0;
+    }
+
+    for(auto & i : searchKillers) {
+        for(auto & j : i)
+            j = Move();
+    }
+
+    pvTable.clear();
+    ply = 0;
+}
+
 /*
  * sq: 120-based square
  */
-void Board::clearPiece(const int sq) {
-    assert(sqOnBoard(sq));
+void Board::clear_piece(const int sq) {
+    assert(is_on_board(sq));
 
     int pce = pieces[sq];
     assert(pieceValid(pce));
@@ -593,9 +606,9 @@ void Board::clearPiece(const int sq) {
     pceList[pce][t_pceNum] = pceList[pce][pceNum[pce]];
 }
 
-void Board::addPiece(const int sq, const int pce) {
+void Board::add_piece(const int sq, const int pce) {
     assert(pieceValid(pce));
-    assert(sqOnBoard(sq));
+    assert(is_on_board(sq));
 
     int col = pieceCol[pce];
 
@@ -617,9 +630,9 @@ void Board::addPiece(const int sq, const int pce) {
     pceList[pce][pceNum[pce]++] = sq;
 }
 
-void Board::movePiece(const int from, const int to) {
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+void Board::move_piece(const int from, const int to) {
+    assert(is_on_board(from));
+    assert(is_on_board(to));
 
     int idx = 0;
     int pce = pieces[from];
@@ -650,14 +663,14 @@ void Board::movePiece(const int from, const int to) {
     assert(t_pieceNum);
 }
 
-bool Board::makeMove(Move& move) {
-    assert(checkBoard());
+bool Board::make_move(Move& move) {
+    assert(check_board());
 
     int from = move.from();
     int to = move.to();
 
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+    assert(is_on_board(from));
+    assert(is_on_board(to));
     assert(sideValid(side));
     assert(pieceValid(pieces[from]));
 
@@ -665,22 +678,22 @@ bool Board::makeMove(Move& move) {
 
     if(move.ep_capture()) {
         if(side == WHITE)
-            clearPiece(to-10);
+            clear_piece(to - 10);
         else
-            clearPiece(to+10);
+            clear_piece(to + 10);
     } else if (move.castle()) {
         switch(to) {
             case C1:
-                movePiece(A1, D1);
+                move_piece(A1, D1);
                 break;
             case C8:
-                movePiece(A8, D8);
+                move_piece(A8, D8);
                 break;
             case G1:
-                movePiece(H1, F1);
+                move_piece(H1, F1);
                 break;
             case G8:
-                movePiece(H8, F8);
+                move_piece(H8, F8);
                 break;
             default:
                 assert(false);
@@ -707,7 +720,7 @@ bool Board::makeMove(Move& move) {
     int cap = move.captured();
     if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
-        clearPiece(to);
+        clear_piece(to);
         fiftyMove = 0;
     }
 
@@ -728,14 +741,14 @@ bool Board::makeMove(Move& move) {
         }
     }
 
-    movePiece(from, to);
+    move_piece(from, to);
 
     // Check promotion.
     int pro = move.promoted();
     if(pro != EMPTY) {
         assert(pieceValid(pro) && !piecePawn[pro]);
-        clearPiece(to);
-        addPiece(to, pro);
+        clear_piece(to);
+        add_piece(to, pro);
     }
 
     if(pieceKing[pieces[to]]) {
@@ -745,19 +758,19 @@ bool Board::makeMove(Move& move) {
     side ^= 1;
     posKey.hashSide();
 
-    assert(checkBoard());
+    assert(check_board());
 
     // Ensure the move didn't leave the king in check.
-    if(sqAttacked(kingSq[side^1], side)) {
-        takeMove();
+    if(sq_attacked(kingSq[side ^ 1], side)) {
+        take_move();
         return false;
     }
 
     return true;
 }
 
-void Board::takeMove() {
-    assert(checkBoard());
+void Board::take_move() {
+    assert(check_board());
 
     hisPly--;
     ply--;
@@ -766,8 +779,8 @@ void Board::takeMove() {
     int from = move.from();
     int to = move.to();
 
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+    assert(is_on_board(from));
+    assert(is_on_board(to));
 
     castlePerm = history[hisPly].castlePerm;
     fiftyMove = history[hisPly].fiftyMove;
@@ -777,29 +790,29 @@ void Board::takeMove() {
 
     if(move.ep_capture()) {
         if(side == WHITE)
-            addPiece(to-10, bP);
+            add_piece(to - 10, bP);
         else
-            addPiece(to+10, wP);
+            add_piece(to + 10, wP);
     } else if(move.castle()) {
         switch (to) {
             case C1:
-                movePiece(D1, A1);
+                move_piece(D1, A1);
                 break;
             case C8:
-                movePiece(D8, A8);
+                move_piece(D8, A8);
                 break;
             case G1:
-                movePiece(F1, H1);
+                move_piece(F1, H1);
                 break;
             case G8:
-                movePiece(F8, H8);
+                move_piece(F8, H8);
                 break;
             default:
                 assert(false);
         }
     }
 
-    movePiece(to, from);
+    move_piece(to, from);
 
     if(pieceKing[pieces[from]])
         kingSq[side] = from;
@@ -807,19 +820,19 @@ void Board::takeMove() {
     int cap = move.captured();
     if(cap != EMPTY && !move.ep_capture()) {
         assert(pieceValid(cap));
-        addPiece(to, cap);
+        add_piece(to, cap);
     }
 
     int pro = move.promoted();
     if(pro != EMPTY) {
         assert(pieceValid(pro) && !piecePawn[pro]);
-        clearPiece(from);
-        addPiece(from, pieceCol[pro] == WHITE ? wP : bP);
+        clear_piece(from);
+        add_piece(from, pieceCol[pro] == WHITE ? wP : bP);
     }
 
     posKey = history[hisPly].posKey;
 
-    assert(checkBoard());
+    assert(check_board());
 }
 
 /*
@@ -831,13 +844,12 @@ u64 Board::perft(int depth) {
 
     u64 nodes = 0;
     MoveGen mg(this);
-    MoveList ml;
-    mg.generateAllMoves(&ml);
-    for(int i = 0; i < ml.count; i++) {
-        if (!makeMove(ml.moves[i].move))
+    MoveListPtr ml = mg.generateAllMoves();
+    for(auto & i : *ml) {
+        if (!make_move(i.move))
             continue;
         nodes += perft(depth-1);
-        takeMove();
+        take_move();
     }
 
     return nodes;
@@ -873,8 +885,8 @@ void Board::perft_suite(int depth, const std::string& resultsfile) {
 bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct) {
     if (depth < 1 || depth > 6) throw std::invalid_argument("Depth should be between one and six.");
 
-    setUpEmpty();
-    setUp(fen);
+    initialize();
+    initialize(fen);
     u64 res = perft(depth);
 
     bool pass = (res == correct[depth-1]);
@@ -888,45 +900,9 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct
 }
 
 /*
- * It may seem strange to parse a string into a move in the board class, but it
- * makes identifying the move easier, and we can correctly tag it as en passant
- * and the like.
+ * Update the pvArray variable based on the content of the pvTable.
  */
-Move Board::getMove(std::string str) {
-    if (str[1] > '8' || str[1] < '1' || str[3] > '8' || str[3] < '1' || str[0] > 'h'
-    || str[0] < 'a' || str[2] > 'h' || str[2] < 'a' || str.length() < 4 || str.length() > 6)
-        throw std::invalid_argument("Bad string input");
-
-    int from = FR2SQ(str[0] - 'a', str[1] - '1');
-    int to = FR2SQ(str[2] - 'a', str[3] - '1');
-
-    assert(sqOnBoard(from) && sqOnBoard(to));
-
-    MoveList list;
-    MoveGen mg(this);
-    mg.generateAllMoves(&list);
-    for (int i=0; i < list.count; i++) {
-        Move m = list.moves[i].move;
-        if(m.from() == from && m.to() == to) {
-            int pro = m.promoted();
-            if(pro != EMPTY) {
-                if(isRQ(pro) && !isBQ(pro) && str[4] == 'r')
-                    return m;
-                else if(!isRQ(pro) && isBQ(pro) && str[4] == 'b')
-                    return m;
-                else if(isRQ(pro) && isBQ(pro) && str[4] == 'q')
-                    return m;
-                else if(isKn(pro) && str[4] == 'n')
-                    return m;
-                continue;
-            }
-            return m;
-        }
-    }
-    throw std::invalid_argument("Bad string input");
-}
-
-int Board::getPVLine(const int depth) {
+int Board::update_pv_line(const int depth) {
     assert(depth < MAX_DEPTH);
 
     std::optional<Move> mv_opt = pvTable.probe(posKey);
@@ -935,7 +911,7 @@ int Board::getPVLine(const int depth) {
         assert(count < MAX_DEPTH);
 
         if(MoveGen(this).moveValid(mv_opt.value())) {
-            makeMove(mv_opt.value());
+            make_move(mv_opt.value());
             pvArray[count++] = mv_opt.value();
         } else
             break;
@@ -944,9 +920,32 @@ int Board::getPVLine(const int depth) {
     }
 
     while (ply > 0)
-        takeMove();
+        take_move();
 
     return count;
+}
+
+/*
+ * Detects existance of a single repetition. A repetition could only have happened since the
+ * last time the fifty move rule counter was reset.
+ */
+bool Board::is_repetition() const {
+    int count = 0;
+    for(int i = hisPly-fiftyMove; i < hisPly-1; i++) {
+        if(posKey == history[i].posKey) {
+            count++;
+        }
+    }
+
+    return count >= 2;
+}
+
+bool Board::is_on_board(const int sq) {
+    return Board::filesBrd[sq] != OFFBOARD;
+}
+
+bool Board::is_off_board(const int sq) {
+    return Board::filesBrd[sq] == OFFBOARD;
 }
 
 int Board::sq120ToSq64[BRD_SQ_NUM];

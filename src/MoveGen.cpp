@@ -4,53 +4,50 @@
 
 #include <cassert>
 #include "MoveGen.h"
+#include "Move.h"
+#include "Board.h"
 #include "assertions.cpp"
-#include "iostream"
 
 MoveGen::MoveGen(Board* b) {
     board = b;
 }
 
-void MoveGen::addQuietMove(const Move& m, MoveList *list) {
-    assert(sqOnBoard(m.from()));
-    assert(sqOnBoard(m.to()));
+void MoveGen::addQuietMove(const Move& m, const MoveListPtr& list) {
+    assert(Board::is_on_board(m.from()));
+    assert(Board::is_on_board(m.to()));
 
-    list->moves[list->count].move = m;
+    int score = 0;
 
     if(board->searchKillers[0][board->ply] == m) {
-        list->moves[list->count].score = 900000;
+        score = 900000;
     } else if(board->searchKillers[1][board->ply] == m) {
-        list->moves[list->count].score = 800000;
+        score = 800000;
     } else {
-        list->moves[list->count].score = board->searchHistory[board->pieces[m.from()]][m.to()];
+        score = board->searchHistory[board->pieces[m.from()]][m.to()];
     }
 
-    list->count++;
+    list->emplace_back(m, score);
 }
 
-void MoveGen::addCaptureMove(const Move& m, MoveList *list) {
-    assert(sqOnBoard(m.from()));
-    assert(sqOnBoard(m.to()));
+void MoveGen::addCaptureMove(const Move& m, const MoveListPtr& list) {
+    assert(Board::is_on_board(m.from()));
+    assert(Board::is_on_board(m.to()));
     assert(pieceValid(m.captured()));
 
-    list->moves[list->count].move = m;
-    list->moves[list->count].score = mvvLvaScores[m.captured()][board->pieces[m.from()]] + 1000000;
-    list->count++;
+    list->emplace_back(m, mvvLvaScores[m.captured()][board->pieces[m.from()]] + 1000000);
 }
 
-void MoveGen::addEnPassantMove(const Move& m, MoveList *list) {
-    assert(sqOnBoard(m.from()));
-    assert(sqOnBoard(m.to()));
+void MoveGen::addEnPassantMove(const Move& m, const MoveListPtr& list) {
+    assert(Board::is_on_board(m.from()));
+    assert(Board::is_on_board(m.to()));
 
-    list->moves[list->count].move = m;
-    list->moves[list->count].score = 105 + 1000000;
-    list->count++;
+    list->emplace_back(m, 105+1000000);
 }
 
-void MoveGen::generateAllMoves(MoveList *list) {
-    assert(board->checkBoard());
+MoveListPtr MoveGen::generateAllMoves() {
+    assert(board->check_board());
 
-    list->count = 0;
+    MoveListPtr list = std::make_shared<std::vector<SearchMove>>();
 
     int pce = EMPTY;
     int side = board->side;
@@ -60,7 +57,7 @@ void MoveGen::generateAllMoves(MoveList *list) {
     if(side == WHITE) {
         for(pceNum = 0; pceNum < board->pceNum[wP]; ++pceNum) {
             sq = board->pceList[wP][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             // Pawns.
             // Generate non-capture moves.
@@ -71,9 +68,9 @@ void MoveGen::generateAllMoves(MoveList *list) {
             }
 
             // Generate captures.
-            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+9]]==BLACK)
+            if(!Board::is_off_board(sq) && pieceCol[board->pieces[sq+9]]==BLACK)
                 addWhitePawnCapMove(sq, sq+9, board->pieces[sq+9], list);
-            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+11]]==BLACK)
+            if(!Board::is_off_board(sq) && pieceCol[board->pieces[sq+11]]==BLACK)
                 addWhitePawnCapMove(sq, sq+11, board->pieces[sq+11], list);
             // En passant captures.
             if(board->enPas != NO_SQ) {
@@ -87,7 +84,7 @@ void MoveGen::generateAllMoves(MoveList *list) {
         // Generate short castle.
         if(board->castlePerm & WKCA) {
             if(board->pieces[F1] == EMPTY && board->pieces[G1] == EMPTY) {
-                if(!board->sqAttacked(E1, BLACK) && !board->sqAttacked(F1, BLACK))
+                if(!board->sq_attacked(E1, BLACK) && !board->sq_attacked(F1, BLACK))
                     addQuietMove(Move(E1, G1, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
@@ -95,14 +92,14 @@ void MoveGen::generateAllMoves(MoveList *list) {
         // Generate long castle.
         if(board->castlePerm & WQCA) {
             if(board->pieces[D1] == EMPTY && board->pieces[C1] == EMPTY && board->pieces[B1] == EMPTY) {
-                if(!board->sqAttacked(E1, BLACK) && !board->sqAttacked(D1, BLACK))
+                if(!board->sq_attacked(E1, BLACK) && !board->sq_attacked(D1, BLACK))
                     addQuietMove(Move(E1, C1, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
     } else {
         for(pceNum = 0; pceNum < board->pceNum[bP]; ++pceNum) {
             sq = board->pceList[bP][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             // Pawns.
             // Generate non-capture moves.
@@ -113,9 +110,9 @@ void MoveGen::generateAllMoves(MoveList *list) {
             }
 
             // Generate captures.
-            if(!sqOffBoard(sq-9) && pieceCol[board->pieces[sq-9]] == WHITE)
+            if(!Board::is_off_board(sq-9) && pieceCol[board->pieces[sq-9]] == WHITE)
                 addBlackPawnCapMove(sq, sq-9, board->pieces[sq-9], list);
-            if(!sqOffBoard(sq-11) && pieceCol[board->pieces[sq-11]] == WHITE)
+            if(!Board::is_off_board(sq-11) && pieceCol[board->pieces[sq-11]] == WHITE)
                 addBlackPawnCapMove(sq, sq-11, board->pieces[sq-11], list);
 
             // En passant captures.
@@ -130,7 +127,7 @@ void MoveGen::generateAllMoves(MoveList *list) {
         // Generate short castle.
         if(board->castlePerm & BKCA) {
             if(board->pieces[F8] == EMPTY && board->pieces[G8] == EMPTY) {
-                if(!board->sqAttacked(E8, WHITE) && !board->sqAttacked(F8, WHITE))
+                if(!board->sq_attacked(E8, WHITE) && !board->sq_attacked(F8, WHITE))
                     addQuietMove(Move(E8, G8, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
@@ -138,7 +135,7 @@ void MoveGen::generateAllMoves(MoveList *list) {
         // Generate long castle.
         if(board->castlePerm & BQCA) {
             if(board->pieces[D8] == EMPTY && board->pieces[C8] == EMPTY && board->pieces[B8] == EMPTY) {
-                if(!board->sqAttacked(E8, WHITE) && !board->sqAttacked(D8, WHITE))
+                if(!board->sq_attacked(E8, WHITE) && !board->sq_attacked(D8, WHITE))
                     addQuietMove(Move(E8, C8, EMPTY, EMPTY, MFLAGCA), list);
             }
         }
@@ -153,13 +150,13 @@ void MoveGen::generateAllMoves(MoveList *list) {
 
         for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
             sq = board->pceList[pce][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
                 t_sq = sq + dir;
 
-                while(!sqOffBoard(t_sq)) {
+                while(!Board::is_off_board(t_sq)) {
                     if(board->pieces[t_sq] != EMPTY) {
                         if(pieceCol[board->pieces[t_sq]] == !side)
                             addCaptureMove(Move(sq, t_sq, board->pieces[t_sq], EMPTY, 0), list);
@@ -180,13 +177,13 @@ void MoveGen::generateAllMoves(MoveList *list) {
 
         for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
             sq = board->pceList[pce][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
                 t_sq = sq + dir;
 
-                if(sqOffBoard(t_sq))
+                if(Board::is_off_board(t_sq))
                     continue;
 
                 if(board->pieces[t_sq] != EMPTY) {
@@ -201,15 +198,17 @@ void MoveGen::generateAllMoves(MoveList *list) {
 
         pce = loopNonSlidePce[pceIndex++];
     }
+
+    return list;
 }
 
 /*
  * TODO: Make more efficient/better?
  */
-void MoveGen::generateAllCaps(MoveList *list) {
-    assert(board->checkBoard());
+MoveListPtr MoveGen::generateAllCaps() {
+    assert(board->check_board());
 
-    list->count = 0;
+    MoveListPtr list = std::make_shared<std::vector<SearchMove>>();
 
     int pce = EMPTY;
     int side = board->side;
@@ -219,13 +218,13 @@ void MoveGen::generateAllCaps(MoveList *list) {
     if(side == WHITE) {
         for(pceNum = 0; pceNum < board->pceNum[wP]; ++pceNum) {
             sq = board->pceList[wP][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             // Pawns.
             // Generate captures.
-            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+9]]==BLACK)
+            if(!Board::is_off_board(sq) && pieceCol[board->pieces[sq+9]]==BLACK)
                 addWhitePawnCapMove(sq, sq+9, board->pieces[sq+9], list);
-            if(!sqOffBoard(sq) && pieceCol[board->pieces[sq+11]]==BLACK)
+            if(!Board::is_off_board(sq) && pieceCol[board->pieces[sq+11]]==BLACK)
                 addWhitePawnCapMove(sq, sq+11, board->pieces[sq+11], list);
             // En passant captures.
             if(board->enPas != NO_SQ) {
@@ -238,13 +237,13 @@ void MoveGen::generateAllCaps(MoveList *list) {
     } else {
         for(pceNum = 0; pceNum < board->pceNum[bP]; ++pceNum) {
             sq = board->pceList[bP][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             // Pawns.
             // Generate captures.
-            if(!sqOffBoard(sq-9) && pieceCol[board->pieces[sq-9]] == WHITE)
+            if(!Board::is_off_board(sq-9) && pieceCol[board->pieces[sq-9]] == WHITE)
                 addBlackPawnCapMove(sq, sq-9, board->pieces[sq-9], list);
-            if(!sqOffBoard(sq-11) && pieceCol[board->pieces[sq-11]] == WHITE)
+            if(!Board::is_off_board(sq-11) && pieceCol[board->pieces[sq-11]] == WHITE)
                 addBlackPawnCapMove(sq, sq-11, board->pieces[sq-11], list);
 
             // En passant captures.
@@ -266,13 +265,13 @@ void MoveGen::generateAllCaps(MoveList *list) {
 
         for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
             sq = board->pceList[pce][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
                 t_sq = sq + dir;
 
-                while(!sqOffBoard(t_sq)) {
+                while(!Board::is_off_board(t_sq)) {
                     if(board->pieces[t_sq] != EMPTY) {
                         if(pieceCol[board->pieces[t_sq]] == !side)
                             addCaptureMove(Move(sq, t_sq, board->pieces[t_sq], EMPTY, 0), list);
@@ -292,13 +291,13 @@ void MoveGen::generateAllCaps(MoveList *list) {
 
         for(pceNum = 0; pceNum < board->pceNum[pce]; ++pceNum) {
             sq = board->pceList[pce][pceNum];
-            assert(sqOnBoard(sq));
+            assert(Board::is_on_board(sq));
 
             for(index = 0; index < numDir[pce]; ++index) {
                 dir = pceDir[pce][index];
                 t_sq = sq + dir;
 
-                if(sqOffBoard(t_sq))
+                if(Board::is_off_board(t_sq))
                     continue;
 
                 if(board->pieces[t_sq] != EMPTY) {
@@ -312,12 +311,14 @@ void MoveGen::generateAllCaps(MoveList *list) {
 
         pce = loopNonSlidePce[pceIndex++];
     }
+
+    return list;
 }
 
-void MoveGen::addWhitePawnCapMove(int from, int to, int cap, MoveList *list) {
+void MoveGen::addWhitePawnCapMove(int from, int to, int cap, const MoveListPtr& list) {
     assert(pieceValidEmpty(cap));
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+    assert(Board::is_on_board(from));
+    assert(Board::is_on_board(to));
 
     if(Board::ranksBrd[from] == RANK_7) {
         addCaptureMove(Move(from, to, cap, wQ, 0), list);
@@ -329,10 +330,10 @@ void MoveGen::addWhitePawnCapMove(int from, int to, int cap, MoveList *list) {
     }
 }
 
-void MoveGen::addBlackPawnCapMove(int from, int to, int cap, MoveList *list) {
+void MoveGen::addBlackPawnCapMove(int from, int to, int cap, const MoveListPtr& list) {
     assert(pieceValidEmpty(cap));
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+    assert(Board::is_on_board(from));
+    assert(Board::is_on_board(to));
 
     if(Board::ranksBrd[from] == RANK_2) {
         addCaptureMove(Move(from, to, cap, bQ, 0), list);
@@ -344,9 +345,9 @@ void MoveGen::addBlackPawnCapMove(int from, int to, int cap, MoveList *list) {
     }
 }
 
-void MoveGen::addWhitePawnMove(int from, int to, MoveList *list) {
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+void MoveGen::addWhitePawnMove(int from, int to, const MoveListPtr& list) {
+    assert(Board::is_on_board(from));
+    assert(Board::is_on_board(to));
 
     if(Board::ranksBrd[from] == RANK_7) {
         addQuietMove(Move(from, to, EMPTY, wQ, 0), list);
@@ -358,9 +359,9 @@ void MoveGen::addWhitePawnMove(int from, int to, MoveList *list) {
     }
 }
 
-void MoveGen::addBlackPawnMove(int from, int to, MoveList *list) {
-    assert(sqOnBoard(from));
-    assert(sqOnBoard(to));
+void MoveGen::addBlackPawnMove(int from, int to, const MoveListPtr& list) {
+    assert(Board::is_on_board);
+    assert(Board::is_on_board);
 
     if(Board::ranksBrd[from] == RANK_2) {
         addQuietMove(Move(from, to, EMPTY, bQ, 0), list);
@@ -376,16 +377,15 @@ void MoveGen::addBlackPawnMove(int from, int to, MoveList *list) {
  * Returns whether the move is possible for the current board->
  */
 bool MoveGen::moveValid(const Move& move) {
-    MoveList ml;
-    generateAllMoves(&ml);
+    auto ml = generateAllMoves();
 
-    for(int i=0; i < ml.count; ++i) {
-        Move mv = ml.moves[i].move;
-        if (!board->makeMove(mv))
+    for(auto & i : *ml) {
+        Move mv = i.move;
+        if (!board->make_move(mv))
             continue;
-        board->takeMove();
+        board->take_move();
 
-        if (ml.moves[i].move == mv)
+        if (i.move == mv)
             return true;
     }
 

@@ -7,7 +7,9 @@
 
 #include <string>
 #include "Defs.h"
+#include "assertions.cpp"
 
+class Board;
 
 class Move {
 public:
@@ -19,25 +21,49 @@ public:
     Move& operator=(const Move& rhs);
     bool operator==(const Move& rhs) const;
 
-    int from() const;
-    int to() const;
-    int captured() const;
-    int promoted() const;
-    bool ep_capture() const;
-    bool pawn_start() const;
-    bool castle() const;
-    bool capture() const;
-    bool promotion() const;
+    [[nodiscard]] int from() const;
+    [[nodiscard]] int to() const;
+    [[nodiscard]] int captured() const;
+    [[nodiscard]] int promoted() const;
+    [[nodiscard]] bool ep_capture() const;
+    [[nodiscard]] bool pawn_start() const;
+    [[nodiscard]] bool castle() const;
+    [[nodiscard]] bool capture() const;
+    [[nodiscard]] bool promotion() const;
 
-    std::string to_str() const;
+    [[nodiscard]] std::string to_str() const;
+    static Move from_str(const std::string & move_str, Board & board);
 
     int move;
 };
 
-typedef struct {
+class SearchMove {
+public:
+    SearchMove() : move(Move()), score(0) {};
+    SearchMove(const Move& p_move, int p_score)
+        : move(p_move), score(p_score) {};
+    SearchMove(const SearchMove& rhs) : move(rhs.move), score(rhs.score) {};
+    SearchMove(SearchMove&& rhs) noexcept
+            : move(rhs.move), score(rhs.score) {};
+
+    SearchMove& operator=(const SearchMove& rhs) {
+        if (this != &rhs) {  // Self-assignment check
+            move = rhs.move;
+            score = rhs.score;
+        }
+        return *this;
+    }
+
+    SearchMove& operator=(SearchMove&& rhs) noexcept {
+        if (this != &rhs) {  // Self-assignment check
+            move = rhs.move;
+            score = rhs.score;
+        }
+        return *this;
+    }
+
     Move move;
     int score;
-} SearchMove;
-
+};
 
 #endif //ATHENE_MOVE_H
