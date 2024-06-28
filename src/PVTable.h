@@ -26,7 +26,8 @@ public:
         Move move;
     };
 
-    explicit PVTable(int size = 0x100000 * 2);
+    // Default size of 2 MB.
+    explicit PVTable(int size = 0x100000 * 64);
 
     PVTable(const PVTable& rhs);
     PVTable& operator=(const PVTable& rhs);
@@ -34,6 +35,8 @@ public:
     void clear();
     void store(const PosKey& key, const Move& mv);
     std::optional<Move> probe(const PosKey& key);
+
+    PVTable resize(int new_size);
 
 private:
     std::unique_ptr<PVEntry[]> table;

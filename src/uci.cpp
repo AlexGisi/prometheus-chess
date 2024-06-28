@@ -25,6 +25,7 @@ void uci_loop() {
     Board board;
     SearchInfo info;
 
+
     do {
         std::getline(std::cin, cmd);
         std::istringstream is(cmd);
@@ -36,7 +37,7 @@ void uci_loop() {
             std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
 
-            // todo: list options
+            std::cout << "option name Hash" << std::endl;
 
             std::cout << "uciok" << std::endl;
         }
@@ -45,7 +46,7 @@ void uci_loop() {
         else if (token == "position")
             uci_parse_pos(board, std::move(is));
         else if (token == "setoption")
-            ;
+            uci_parse_setoption(board, std::move(is));
         else if (token == "ucinewgame") {
             std::string POSITION_STARTPOS = "startpos";
             std::istringstream isng(POSITION_STARTPOS);
@@ -145,6 +146,14 @@ void uci_parse_pos(Board &board, std::istringstream is) {
     }
 }
 
-
+void uci_parse_setoption(Board &board, std::istringstream is) {
+    std::string token;
+    is >> token;  // Skip "name".
+    is >> token;
+    if (token == "Hash") {
+        is >> token;  // Hash size in MB.
+        board.resize_pv_table(std::stoi(token) * 0x100000);
+    }
+}
 
 

@@ -7,7 +7,7 @@
 #include "PVTable.h"
 
 /*
- * Creates a hash table with a specified size in memory.
+ * Creates a hash table with a specified size (in bytes) in memory.
  */
 PVTable::PVTable(int size) {
     entries = ( size / (int) sizeof(PVEntry) ) - 2;  // Subtract two to avoid any out-of-bounds.
@@ -55,4 +55,14 @@ std::optional<Move> PVTable::probe(const PosKey &key) {
         return {table[idx].move};
     else
         return {};
+}
+
+PVTable PVTable::resize(int new_size) {
+    PVTable new_table(new_size);
+    for (int i=0; i < entries; i++) {
+        if (table[i].move.move != 0) {
+            new_table.store(table[i].posKey, table[i].move);
+        }
+    }
+    return new_table;
 }

@@ -926,7 +926,8 @@ int Board::update_pv_line(const int depth) {
 }
 
 /*
- * Detects existance of a single repetition. A repetition could only have happened since the
+ * Detects whether the three-repetion rule will be invoked in the current
+ * position. A repetition could only have happened since the
  * last time the fifty move rule counter was reset.
  */
 bool Board::is_repetition() const {
@@ -938,6 +939,10 @@ bool Board::is_repetition() const {
     }
 
     return count >= 2;
+}
+
+void Board::resize_pv_table(int size) {
+    pvTable = pvTable.resize(size);
 }
 
 bool Board::is_on_board(const int sq) {

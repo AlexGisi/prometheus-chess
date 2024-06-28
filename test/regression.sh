@@ -30,8 +30,9 @@ current_datetime=$(date +"%Y-%m-%d_%H-%M-%S")
   -pgnout file="${RESULT_DIR}/test_${current_datetime}.pgn" \
   -each tc=2+.1 \
   -rounds 1 \
-  -games 100 \
+  -games 1000 \
   -log file=log.txt level=fatal compress=false \
   -concurrency 8
 
 rm config.json
+rm log.txt

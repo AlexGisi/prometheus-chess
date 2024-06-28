@@ -237,9 +237,6 @@ inline void search(Board& board, SearchInfo& info) {
         pv_moves = board.update_pv_line(current_depth);
         best_move = board.pvArray[0];
 
-        if (current_depth > 50) {
-            std::cout << std::endl;
-        }
         printf("info score cp %d depth %d nodes %llu time %llu ",
                best_score, current_depth, info.nodes, get_time()-info.start_time);
         printf("pv");

@@ -94,6 +94,7 @@ public:
     Move searchKillers[2][MAX_DEPTH];
 
     void prep_search();
+    void resize_pv_table(int size);
 
     // Making moves.
     void clear_piece(int sq);
