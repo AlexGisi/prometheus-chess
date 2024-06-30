@@ -17,7 +17,7 @@ void init() {
     Board::initialize_lookup_tables();
     BitBoard::initBitMasks();
     PosKey::initHashKeys();
-    MoveGen::initMvvLva();
+    MoveGen::init_mvv_lva();
 }
 
 void perft(int depth, const string& resultsfile) {

@@ -69,7 +69,7 @@ inline void pickNextMove(int move_idx, MoveListPtr& ml) {
 
 /*
  * Search just until a quiet position, avoiding the horizon effect.
- * TODO: consider other factors.
+ * TODO: consider other factors, i.e. checks.
  */
 inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     assert(board.check_board());
@@ -78,6 +78,9 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
         checkInterrupt(info);
 
     info.nodes++;
+
+    if(board.is_repetition() || board.fiftyMove >= 100)
+        return 0;
 
     if(board.ply > MAX_DEPTH - 1)
         return eval(board);
@@ -91,13 +94,13 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
         alpha = score;
 
     MoveGen mg(&board);
-    MoveListPtr ml = mg.generateAllCaps();
+    MoveListPtr ml = mg.generate_all_caps();
 
     int legal = 0;
     int old_alpha = alpha;
     Move best_move;
     score = -INFINITE;
-    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+    std::optional<PVTable::PVEntry> pv_move = board.pvTable.probe(board.posKey);
 
     for(int i = 0; i < ml->size(); i++) {
         pickNextMove(i, ml);
@@ -125,9 +128,9 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
         }
     }
 
-    if(alpha != old_alpha)
-        board.pvTable.store(board.posKey, best_move);
-
+    if (alpha != old_alpha) {
+        board.pvTable.store(board.posKey, {board.posKey, {best_move, score}, 0, EntryFlag::HFNONE});
+    }
     return alpha;
 }
 
@@ -149,19 +152,25 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
     if(board.ply > MAX_DEPTH - 1)
         return eval(board);
 
+    std::optional<SearchMove> hash_move = board.pvTable.probe_move(board.posKey, alpha, beta, depth);
+    if (hash_move) {
+        return hash_move.value().score;
+    }
+
     MoveGen mg(&board);
-    MoveListPtr ml = mg.generateAllMoves();
+    MoveListPtr ml = mg.generate_all_moves();
 
     int legal = 0;
     int old_alpha = alpha;
-    Move best_move;
+    SearchMove best_move = SearchMove(Move(), -INFINITE);
+    SearchMove current_move;
     int score = -INFINITE;
-    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+    std::optional<PVTable::PVEntry> pv_entry = board.pvTable.probe(board.posKey);
 
     // Ensure we search the PV line first.
-    if(pv_move) {
+    if(pv_entry) {
         for(auto & i : *ml) {
-            if(i.move == pv_move.value()) {
+            if(i.move == pv_entry.value().move.move) {
                 i.score = 2000000;
                 break;
             }
@@ -177,28 +186,38 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
         legal++;
         score = -alphaBeta(-beta, -alpha, depth-1, board, info, true);
         board.take_move();
+        current_move = SearchMove(ml->at(i).move, score);
 
         if(info.stopped)
             return 0;
 
-        if(score > alpha) {
-            if(score >= beta) {
-                if(legal == 1)
-                    info.fhf++;
-                info.fh++;
+        if (score > best_move.score) {
+            best_move = current_move;
 
-                if(!ml->at(i).move.capture()) {
-                    board.searchKillers[1][board.ply] = board.searchKillers[0][board.ply];
-                    board.searchKillers[0][board.ply] = ml->at(i).move;
+            if(score > alpha) {
+                if(score >= beta) {
+                    if(legal == 1)
+                        info.fhf++;
+                    info.fh++;
+
+                    if(!current_move.move.capture()) {
+                        board.searchKillers[1][board.ply] = board.searchKillers[0][board.ply];
+                        board.searchKillers[0][board.ply] = ml->at(i).move;
+                    }
+
+                    board.pvTable.store(board.posKey,
+                                        {board.posKey,
+                                         {current_move.move, beta},
+                                         depth,
+                                         EntryFlag::HFBETA});
+
+                    return beta;
                 }
+                alpha = score;
 
-                return beta;
-            }
-            alpha = score;
-            best_move = ml->at(i).move;
-
-            if(!ml->at(i).move.capture()) {
-                board.searchHistory[board.pieces[best_move.from()]][best_move.to()] += depth;
+                if(!current_move.move.capture()) {
+                    board.searchHistory[board.pieces[best_move.move.from()]][best_move.move.to()] += depth;
+                }
             }
         }
     }
@@ -210,8 +229,11 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
             return 0;
     }
 
-    if(alpha != old_alpha)
-        board.pvTable.store(board.posKey, best_move);
+    if(alpha != old_alpha) {
+        board.pvTable.store(board.posKey, {board.posKey, best_move, depth, EntryFlag::HFEXACT});
+    } else{
+        board.pvTable.store(board.posKey, {board.posKey, {best_move.move, alpha}, depth, EntryFlag::HFALPHA});
+    }
 
     return alpha;
 }
@@ -231,11 +253,22 @@ inline void search(Board& board, SearchInfo& info) {
     for(current_depth = 1; current_depth <= info.depth; ++current_depth) {
         best_score = alphaBeta(-INFINITE, INFINITE, current_depth, board, info, true);
 
-        if(info.stopped)
-            break;
-
+        // Need to be sure some move has been inserted into table before this.
         pv_moves = board.update_pv_line(current_depth);
         best_move = board.pvArray[0];
+
+//        if (pv_moves > 0) {
+//            best_move = board.pvArray[0];
+//        } else {
+//            auto start = get_time();
+//            best_move = MoveGen(&board).generate_a_legal_move();
+//            auto end = get_time();
+//            std::cout << "------used random move in " << end - start << "ms" << std::endl;
+//        }
+
+        // Be sure best_move has been populated before this hits.
+        if(info.stopped)
+            break;
 
         printf("info score cp %d depth %d nodes %llu time %llu ",
                best_score, current_depth, info.nodes, get_time()-info.start_time);
@@ -244,9 +277,9 @@ inline void search(Board& board, SearchInfo& info) {
             printf(" %s", board.pvArray[pv_num].to_str().c_str());
         }
         std::cout << std::endl;
+
+        // Measure of move ordering effectiveness; >0.9 is good
         // printf("Ordering:%.2f\n", info.fhf / info.fh);
     }
-    // printf("bestmove %s\n", best_move.to_str().c_str());
     std::cout << "bestmove " << best_move.to_str() << std::endl;
-    // assert(board.make_move(best_move));
 }

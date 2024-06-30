@@ -55,6 +55,7 @@ void Board::initialize() {
     }
 
     posKey = PosKey(this);
+    pvTable.clear();
 }
 
 void Board::initialize(const std::string& fen) {
@@ -559,7 +560,7 @@ void Board::prep_search() {
             j = Move();
     }
 
-    pvTable.clear();
+    pvTable.prep_search();
     ply = 0;
 }
 
@@ -844,7 +845,7 @@ u64 Board::perft(int depth) {
 
     u64 nodes = 0;
     MoveGen mg(this);
-    MoveListPtr ml = mg.generateAllMoves();
+    MoveListPtr ml = mg.generate_all_moves();
     for(auto & i : *ml) {
         if (!make_move(i.move))
             continue;
@@ -905,22 +906,26 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct
 int Board::update_pv_line(const int depth) {
     assert(depth < MAX_DEPTH);
 
-    std::optional<Move> mv_opt = pvTable.probe(posKey);
+    std::optional<PVTable::PVEntry> mv_opt = pvTable.probe(posKey);
     int count = 0;
     while (mv_opt && count < depth) {
         assert(count < MAX_DEPTH);
 
-        if(MoveGen(this).moveValid(mv_opt.value())) {
-            make_move(mv_opt.value());
-            pvArray[count++] = mv_opt.value();
-        } else
+        if(MoveGen(this).is_move_valid(mv_opt.value().move.move)) {
+            make_move(mv_opt.value().move.move);
+            pvArray[count++] = mv_opt.value().move.move;
+        } else {
             break;
+        }
 
         mv_opt = pvTable.probe(posKey);
     }
 
     while (ply > 0)
         take_move();
+
+    if (count == 0)
+        pvTable.probe(posKey);
 
     return count;
 }

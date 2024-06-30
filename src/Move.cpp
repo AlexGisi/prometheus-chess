@@ -42,7 +42,7 @@ Move Move::from_str(const std::string &move_str, Board &board) {
     assert(Board::is_on_board(from) && Board::is_on_board(to));
 
     MoveGen mg(&board);
-    MoveListPtr list = mg.generateAllMoves();
+    MoveListPtr list = mg.generate_all_moves();
     for (auto & i : *list) {
         Move m = i.move;
         if(m.from() == from && m.to() == to) {

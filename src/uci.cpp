@@ -37,7 +37,7 @@ void uci_loop() {
             std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
 
-            std::cout << "option name Hash" << std::endl;
+            std::cout << "option name Hash value 64" << std::endl;
 
             std::cout << "uciok" << std::endl;
         }
@@ -109,7 +109,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
     if (time != -1) {
         info.time_set = true;
         time /= movestogo;
-        time -= 50;  // Cushion to be safe.
+        time -= 25;  // Cushion to be safe.
         info.stop_time = info.start_time + time + inc;
     }
 
