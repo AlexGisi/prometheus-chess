@@ -5,7 +5,7 @@ Score of prometheus_new vs vice: 30 - 881 - 89 [0.074] 1000
 Elo difference: -437.69 +/- 34.09, LOS: 0.00 %, DrawRatio: 8.90 %
 
 iter=10, depth=8, depth=3
-kNPS 95% confidence interval: ((1728, 1764))
+kNPS 95% confidence interval: ((1826, 1907))
 
 177f49c730760f4fe48377ac894b8b4946a6db90
 prometheus_new: 64MB hash table
