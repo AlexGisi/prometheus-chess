@@ -55,3 +55,4 @@ dist/
 
 test/config.sh
 .DS_STORE
+venv/
