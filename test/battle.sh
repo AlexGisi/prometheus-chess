@@ -24,13 +24,13 @@ current_datetime=$(date +"%Y-%m-%d_%H-%M-%S")
 
 "$FAST_CHESS" \
   -engine cmd="$ENGINE" name=prometheus_new \
-  -engine cmd="$REGRESSION_ENGINE" name=prometheus_old \
+  -engine cmd="$BATTLE_ENGINE" name="$BATTLE_ENGINE_NAME" \
   -openings file="$OPENINGS" format=pgn -randomseed \
   -output format=cutechess \
   -pgnout file="${RESULT_DIR}/test_${current_datetime}.pgn" \
   -each tc=2+.1 \
   -rounds 1 \
-  -games 100 \
+  -games 1000 \
   -log file=log.txt level=fatal compress=false \
   -concurrency 8
 

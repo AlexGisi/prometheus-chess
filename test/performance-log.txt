@@ -8,3 +8,17 @@ LOS: 0.00 %, DrawRatio: 10.00 %, PairsRatio: -nan
 Games: 100, Wins: 5, Losses: 85, Draws: 10, Points: 10.0 (10.00 %)
 Ptnml(0-2): [0, 0, 0, 0, 0]
 --------------------------------------------------
+
+177f49c730760f4fe48377ac894b8b4946a6db90
+prometheus_new: 64MB hash table
+prometheus_old: 2MB hash table
+Score of prometheus_new vs prometheus_old: 348 - 177 - 475 [0.585] 1000
+Elo difference: 60.00 +/- 15.63, LOS: 100.00 %, DrawRatio: 47.50 %
+
+fa0b07ee97fcd669b2256328c67ea1a6dabc12e0
+Score of prometheus_new vs prometheus_old: 470 - 83 - 447 [0.694] 1000
+Elo difference: 141.85 +/- 16.10, LOS: 100.00 %, DrawRatio: 44.70 %
+
+Score of prometheus_new vs vice: 40 - 885 - 75 [0.077] 1000
+Elo difference: -430.27 +/- 34.95, LOS: 0.00 %, DrawRatio: 7.50 %
+
