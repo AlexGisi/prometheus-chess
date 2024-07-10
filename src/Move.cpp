@@ -14,6 +14,7 @@
  * 0001 0000 0000 0000 0000 0000 0000 -> Was a castle
  */
 
+#include <cassert>
 #include <sstream>
 #include "Move.h"
 #include "Board.h"
