@@ -37,7 +37,7 @@ void uci_loop() {
             std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
 
-            std::cout << "option name Hash value 64" << std::endl;
+            std::cout << "option name Hash type spin default 64 min 1 max 4096" << std::endl;
 
             std::cout << "uciok" << std::endl;
         }
