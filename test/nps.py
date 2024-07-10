@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats as st
 
 VERBOSE = False
-ITER = 10
+ITER = 20
 DEPTH = 8  # Must be > 2
 DEPTHS = 3  # Last n iterations to use
 engine_path = os.getenv('ENGINE_RELEASE')

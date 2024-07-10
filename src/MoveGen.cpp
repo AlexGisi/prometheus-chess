@@ -48,6 +48,7 @@ MoveListPtr MoveGen::generate_all_moves() {
     assert(board->check_board());
 
     MoveListPtr list = std::make_shared<std::vector<SearchMove>>();
+    list->reserve(MAX_POSITION_MOVES);
 
     int pce = EMPTY;
     int side = board->side;
@@ -209,6 +210,7 @@ MoveListPtr MoveGen::generate_all_caps() {
     assert(board->check_board());
 
     MoveListPtr list = std::make_shared<std::vector<SearchMove>>();
+    list->reserve(MAX_POSITION_MOVES);
 
     int pce = EMPTY;
     int side = board->side;
@@ -318,6 +320,7 @@ MoveListPtr MoveGen::generate_all_caps() {
 MoveListPtr MoveGen::generate_all_legal_moves() {
     auto moves = generate_all_moves();
     MoveListPtr moves_legal = std::make_shared<std::vector<SearchMove>>();
+    moves_legal->reserve(MAX_POSITION_MOVES);
 
     for (auto & mv : *moves) {
         if (is_move_valid(mv.move)) {
