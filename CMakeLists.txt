@@ -6,3 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(prometheus src/main.cpp src/Board.cpp src/BitBoard.cpp src/PosKey.cpp src/PosKey.h src/Move.cpp src/Move.h src/MoveGen.cpp src/MoveGen.h src/assertions.cpp src/MoveList.cpp src/MoveList.h src/util.cpp src/search.cpp src/PVTable.cpp src/PVTable.h src/evaluation.cpp src/uci.cpp src/uci.h src/evaluation.h src/util.h)
 
 target_include_directories(prometheus PUBLIC)
+
+find_package(Threads REQUIRED)
+target_link_libraries(prometheus PRIVATE Threads::Threads)
+
