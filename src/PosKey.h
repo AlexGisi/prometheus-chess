@@ -20,6 +20,7 @@ public:
 
     PosKey& operator=(const PosKey& rhs);
     bool operator==(const PosKey& rhs) const;
+    bool operator!=(const PosKey& rhs) const;
 
     static void initHashKeys();
 

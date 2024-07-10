@@ -46,6 +46,10 @@ bool PosKey::operator==(const PosKey& rhs) const {
     return val == rhs.val;
 }
 
+bool PosKey::operator!=(const PosKey& rhs) const {
+    return val != rhs.val;
+}
+
 // Via https://stackoverflow.com/a/21096340/5127535.
 uint64_t PosKey::rand_64() {
     std::random_device rd;

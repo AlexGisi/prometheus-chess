@@ -2,6 +2,7 @@
 // Created by Alex Gisi on 3/23/22.
 //
 
+#include <memory>
 #include <cassert>
 #include "MoveGen.h"
 #include "Move.h"
