@@ -20,9 +20,11 @@ public:
     Board(const Board& rhs);
     Board& operator=(const Board& rhs);
 
-    void setUpEmpty();
-    void setUp(const std::string& fen);
+    void initialize();
+    void initialize(const std::string& fen);
+    void reset();
 
+    // Lookup tables.
     static int sq120ToSq64[BRD_SQ_NUM];
     static int sq64ToSq120[64];
     static int filesBrd[BRD_SQ_NUM];
@@ -30,31 +32,25 @@ public:
     #define sq64(sq) Board::sq120ToSq64[sq]
     #define sq120(sq) Board::sq64ToSq120[sq]
 
-    static void initSq120To64();
-    static void initFilesRanksBrd();
+    static void initialize_lookup_tables();
 
-    static std::string sqToStr(int sq);
+    [[nodiscard]] bool check_board() const;
+    [[nodiscard]] bool sq_attacked(int sq, int att_side) const;
+    void print_squares_attacked(int side) const;
 
-    void reset();
-    void updateListsMaterial();
-    [[nodiscard]] bool checkBoard() const;
-
-    [[nodiscard]] bool sqAttacked(int sq, int att_side) const;
-    void showSqAttBySide(int side) const;
-
+    static std::string sq_to_str(int sq);
     [[nodiscard]] std::string to_str() const;
     void print() const;
 
+    // Assign a piece (could be EMPTY) to every square on the 120-piece board.
     int pieces[BRD_SQ_NUM];
     BitBoard pawns[3];  // WHITE, BLACK, BOTH.
-
     int kingSq[2];
-
     int side;
     int enPas;
-    int fiftyMove;
+    int fiftyMove; // Counts plies towards the fifty-move rule.
 
-    int ply;
+    int ply; // Records depth during searches; starts at 0 for a given search.
     int hisPly;  // History.
 
     PosKey posKey;
@@ -93,25 +89,32 @@ public:
     Move pvArray[MAX_DEPTH];
     friend class PosKey;
 
-    // Arrays for move ordering.
+    // Arrays to heuristically improve move ordering.
     int searchHistory[13][BRD_SQ_NUM];
     Move searchKillers[2][MAX_DEPTH];
 
+    void prep_search();
+    void resize_pv_table(int size);
+
     // Making moves.
-    void clearPiece(int sq);
-    void addPiece(int sq, int pce);
-    void movePiece(int from, int to);
-    bool makeMove(Move& move);
-    void takeMove();
-    Move getMove(std::string str);
+    void clear_piece(int sq);
+    void add_piece(int sq, int pce);
+    void move_piece(int from, int to);
+    bool make_move(Move& move);
+    void take_move();
 
     // Perft.
     u64 perft(int depth);
-    void perft_suite(int depth);
+    void perft_suite(int depth, const std::string& resultsfile);
     bool perft_eval_pos(int depth, const std::string& fen, const u64* correct);
 
     // Principal variation.
-    int getPVLine(int depth);
+    int update_pv_line(int depth);
+
+    // Board status.
+    [[nodiscard]] bool is_repetition() const;
+    [[nodiscard]] static bool is_on_board(int sq);
+    [[nodiscard]] static bool is_off_board(int sq);
 };
 
 

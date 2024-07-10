@@ -1,0 +1,17 @@
+#!/bin/bash
+
+export ENGINE_DEBUG=""
+export ENGINE_RELEASE=""
+
+# Perft testing
+export RESULTS="" # Path to perftsuite.epd
+
+# Engine regression testing
+export FAST_CHESS="" # Path to fastchess executable
+export REGRESSION_ENGINE=""
+export OPENINGS="" # Path to pgn file (recommended is balsa)
+export RESULT_DIR="" # Path to output result games
+
+# Battle
+export BATTLE_ENGINE=""
+export BATTLE_ENGINE_NAME=""

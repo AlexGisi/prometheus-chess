@@ -6,33 +6,41 @@
 #define ATHENE_MOVEGEN_H
 
 #include <vector>
-#include "Board.h"
+#include "Defs.h"
 #include "Move.h"
-#include "MoveList.h"
+
+class Board;
+
+using MoveListPtr = std::shared_ptr<std::vector<SearchMove>>;
 
 class MoveGen {
 public:
     explicit MoveGen(Board* b);
-    void generateAllMoves(MoveList *list);
-    void generateAllCaps(MoveList *list);
-    bool moveValid(const Move& move);
 
-    static int initMvvLva();
+    // Pseudo-legal move generators.
+    MoveListPtr generate_all_moves();
+    MoveListPtr generate_all_caps();
+
+    MoveListPtr generate_all_legal_moves();
+    Move generate_a_legal_move();
+    bool is_move_valid(const Move& move);
+
+    static int init_mvv_lva();
 
     // Move ordering -- most valuable victim, least valuable attacker.
     constexpr static int victimScore[13] = { 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600 };
     static int mvvLvaScores[13][13];
 
 private:
-    void addQuietMove(const Move& m, MoveList *list);
-    void addCaptureMove(const Move& m, MoveList *list);
-    static void addEnPassantMove(const Move& m, MoveList *list);
+    void add_quiet_move(const Move& m, const MoveListPtr& list);
+    void add_capture_move(const Move& m, const MoveListPtr& list);
+    static void add_en_passant_move(const Move& m, const MoveListPtr& list);
 
-    void addWhitePawnCapMove(int from, int to, int cap, MoveList *list);
-    void addBlackPawnCapMove(int from, int to, int cap, MoveList *list);
+    void add_white_pawn_cap_move(int from, int to, int cap, const MoveListPtr& list);
+    void add_black_pawn_cap_move(int from, int to, int cap, const MoveListPtr& list);
 
-    void addWhitePawnMove(int from, int to, MoveList *list);
-    void addBlackPawnMove(int from, int to, MoveList *list);
+    void add_white_pawn_move(int from, int to, const MoveListPtr& list);
+    void add_black_pawn_move(int from, int to, const MoveListPtr& list);
 
     const int loopSlidePce[8] = { wB, wR, wQ, 0, bB, bR, bQ, 0 };
     int loopSlideIdx[2] = { 0, 4 };  // Index the above array by side.

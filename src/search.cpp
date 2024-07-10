@@ -5,10 +5,9 @@
 #include <iostream>
 #include <cassert>
 #include "Board.h"
-#include "util.h"
-#include "evaluation.h"
+#include "util.cpp"
+#include "evaluation.cpp"
 #include "MoveGen.h"
-#include "MoveList.h"
 
 typedef struct {
     u64 start_time;
@@ -25,7 +24,7 @@ typedef struct {
     bool stopped;
 
     float fh;   // Fail high.
-    float fhf;  // Faily high first.
+    float fhf;  // Fail high first.
 } SearchInfo;
 
 /*
@@ -37,33 +36,10 @@ inline void checkInterrupt(SearchInfo& info) {
 }
 
 /*
- * Detects existance of a single repetition. A repetition could only have happened since the
- * last time the fifty move rule counter was reset.
- */
-inline bool hasRepetition(Board& board) {
-    for(int i = 0; i < board.hisPly-board.fiftyMove; i++)
-        if(board.posKey == board.history[i].posKey)
-            return true;
-
-    return false;
-}
-
-/*
  * Does everything but set the start time of the search.
  */
 inline void prepSearch(Board& board, SearchInfo& info) {
-    for(auto & i : board.searchHistory) {
-        for(auto & j : i)
-            j = 0;
-    }
-
-    for(auto & i : board.searchKillers) {
-        for(auto & j : i)
-            j = Move();
-    }
-
-    board.pvTable.clear();
-    board.ply = 0;
+    board.prep_search();
 
     info.stopped = false;
     info.nodes = 0;
@@ -75,33 +51,36 @@ inline void prepSearch(Board& board, SearchInfo& info) {
  * Searching from the index move_idx, switch the move at move_idx with the best
  * move in ml.
  */
-inline void pickNextMove(int move_idx, MoveList& ml) {
+inline void pickNextMove(int move_idx, MoveListPtr& ml) {
     SearchMove temp;
     int best_score = 0;
     int best_idx = move_idx;
 
-    for(int i=move_idx; i < ml.count; i++) {
-        if(ml.moves[i].score > best_score) {
-            best_score = ml.moves[i].score;
+    for(int i=move_idx; i < ml->size(); i++) {
+        if(ml->at(i).score > best_score) {
+            best_score = ml->at(i).score;
             best_idx = i;
         }
     }
-    temp = ml.moves[move_idx];
-    ml.moves[move_idx] = ml.moves[best_idx];
-    ml.moves[best_idx] = temp;
+    temp = (*ml)[move_idx];
+    (*ml)[move_idx] = (*ml)[best_idx];
+    (*ml)[best_idx] = temp;
 }
 
 /*
  * Search just until a quiet position, avoiding the horizon effect.
- * TODO: consider other factors.
+ * TODO: consider other factors, i.e. checks.
  */
 inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
-    assert(board.checkBoard());
+    assert(board.check_board());
 
     if(info.nodes % 2048 == 0 )
         checkInterrupt(info);
 
     info.nodes++;
+
+    if(board.is_repetition() || board.fiftyMove >= 100)
+        return 0;
 
     if(board.ply > MAX_DEPTH - 1)
         return eval(board);
@@ -114,25 +93,24 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     if(score > alpha)
         alpha = score;
 
-    MoveList ml;
     MoveGen mg(&board);
-    mg.generateAllCaps(&ml);
+    MoveListPtr ml = mg.generate_all_caps();
 
     int legal = 0;
     int old_alpha = alpha;
     Move best_move;
     score = -INFINITE;
-    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+    std::optional<PVTable::PVEntry> pv_move = board.pvTable.probe(board.posKey);
 
-    for(int i = 0; i < ml.count; i++) {
+    for(int i = 0; i < ml->size(); i++) {
         pickNextMove(i, ml);
 
-        if(!board.makeMove(ml.moves[i].move))
+        if(!board.make_move(ml->at(i).move))
             continue;
 
         legal++;
         score = -quiescence(-beta, -alpha, board, info);
-        board.takeMove();
+        board.take_move();
 
         if(info.stopped)
             return 0;
@@ -146,18 +124,18 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
                 return beta;
             }
             alpha = score;
-            best_move = ml.moves[i].move;
+            best_move = ml->at(i).move;
         }
     }
 
-    if(alpha != old_alpha)
-        board.pvTable.store(board.posKey, best_move);
-
+    if (alpha != old_alpha) {
+        board.pvTable.store(board.posKey, {board.posKey, {best_move, score}, 0, EntryFlag::HFNONE});
+    }
     return alpha;
 }
 
 inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& info, int doNull) {
-    assert(board.checkBoard());
+    assert(board.check_board());
 
     if(depth == 0) {
         return quiescence(alpha, beta, board, info);
@@ -168,76 +146,94 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
 
     info.nodes++;
 
-    if(hasRepetition(board) || board.fiftyMove >= 100)
+    if(board.is_repetition() || board.fiftyMove >= 100)
         return 0;
 
     if(board.ply > MAX_DEPTH - 1)
         return eval(board);
 
-    MoveList ml;
+    std::optional<SearchMove> hash_move = board.pvTable.probe_move(board.posKey, alpha, beta, depth);
+    if (hash_move) {
+        return hash_move.value().score;
+    }
+
     MoveGen mg(&board);
-    mg.generateAllMoves(&ml);
+    MoveListPtr ml = mg.generate_all_moves();
 
     int legal = 0;
     int old_alpha = alpha;
-    Move best_move;
+    SearchMove best_move = SearchMove(Move(), -INFINITE);
+    SearchMove current_move;
     int score = -INFINITE;
-    std::optional<Move> pv_move = board.pvTable.probe(board.posKey);
+    std::optional<PVTable::PVEntry> pv_entry = board.pvTable.probe(board.posKey);
 
     // Ensure we search the PV line first.
-    if(pv_move) {
-        for(int i = 0; i < ml.count; i++) {
-            if(ml.moves[i].move == pv_move.value()) {
-                ml.moves[i].score = 2000000;
+    if(pv_entry) {
+        for(auto & i : *ml) {
+            if(i.move == pv_entry.value().move.move) {
+                i.score = 2000000;
                 break;
             }
         }
     }
 
-    for(int i = 0; i < ml.count; i++) {
+    for(int i = 0; i < ml->size(); i++) {
         pickNextMove(i, ml);
 
-        if(!board.makeMove(ml.moves[i].move))
+        if(!board.make_move(ml->at(i).move))
             continue;
 
         legal++;
         score = -alphaBeta(-beta, -alpha, depth-1, board, info, true);
-        board.takeMove();
+        board.take_move();
+        current_move = SearchMove(ml->at(i).move, score);
 
         if(info.stopped)
             return 0;
 
-        if(score > alpha) {
-            if(score >= beta) {
-                if(legal == 1)
-                    info.fhf++;
-                info.fh++;
+        if (score > best_move.score) {
+            best_move = current_move;
 
-                if(!ml.moves[i].move.capture()) {
-                    board.searchKillers[1][board.ply] = board.searchKillers[0][board.ply];
-                    board.searchKillers[0][board.ply] = ml.moves[i].move;
+            if(score > alpha) {
+                if(score >= beta) {
+                    if(legal == 1)
+                        info.fhf++;
+                    info.fh++;
+
+                    if(!current_move.move.capture()) {
+                        board.searchKillers[1][board.ply] = board.searchKillers[0][board.ply];
+                        board.searchKillers[0][board.ply] = ml->at(i).move;
+                    }
+
+                    board.pvTable.store(board.posKey,
+                                        {board.posKey,
+                                         {current_move.move, beta},
+                                         depth,
+                                         EntryFlag::HFBETA});
+
+                    return beta;
                 }
+                alpha = score;
 
-                return beta;
-            }
-            alpha = score;
-            best_move = ml.moves[i].move;
-
-            if(!ml.moves[i].move.capture()) {
-                board.searchHistory[board.pieces[best_move.from()]][best_move.to()] += depth;
+                if(!current_move.move.capture()) {
+                    board.searchHistory[board.pieces[best_move.move.from()]][best_move.move.to()] += depth;
+                }
             }
         }
     }
 
     if(legal == 0) {
-        if(board.sqAttacked(board.kingSq[board.side], board.side^1))
+        if(board.sq_attacked(board.kingSq[board.side], board.side ^ 1))
             return -MATE + board.ply;
         else
             return 0;
     }
 
-    if(alpha != old_alpha)
-        board.pvTable.store(board.posKey, best_move);
+    if(alpha != old_alpha) {
+        board.pvTable.store(board.posKey, {board.posKey, best_move, depth, EntryFlag::HFEXACT});
+    } else{
+        board.pvTable.store(board.posKey, {board.posKey, {best_move.move, alpha}, depth, EntryFlag::HFALPHA});
+    }
 
     return alpha;
 }
@@ -257,11 +253,22 @@ inline void search(Board& board, SearchInfo& info) {
     for(current_depth = 1; current_depth <= info.depth; ++current_depth) {
         best_score = alphaBeta(-INFINITE, INFINITE, current_depth, board, info, true);
 
+        // Need to be sure some move has been inserted into table before this.
+        pv_moves = board.update_pv_line(current_depth);
+        best_move = board.pvArray[0];
+
+//        if (pv_moves > 0) {
+//            best_move = board.pvArray[0];
+//        } else {
+//            auto start = get_time();
+//            best_move = MoveGen(&board).generate_a_legal_move();
+//            auto end = get_time();
+//            std::cout << "------used random move in " << end - start << "ms" << std::endl;
+//        }
+
+        // Be sure best_move has been populated before this hits.
         if(info.stopped)
             break;
-
-        pv_moves = board.getPVLine(current_depth);
-        best_move = board.pvArray[0];
 
         printf("info score cp %d depth %d nodes %llu time %llu ",
                best_score, current_depth, info.nodes, get_time()-info.start_time);
@@ -270,8 +277,9 @@ inline void search(Board& board, SearchInfo& info) {
             printf(" %s", board.pvArray[pv_num].to_str().c_str());
         }
         std::cout << std::endl;
+
+        // Measure of move ordering effectiveness; >0.9 is good
         // printf("Ordering:%.2f\n", info.fhf / info.fh);
     }
-    // printf("bestmove %s\n", best_move.to_str().c_str());
     std::cout << "bestmove " << best_move.to_str() << std::endl;
 }

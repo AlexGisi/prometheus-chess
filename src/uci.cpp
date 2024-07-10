@@ -11,6 +11,7 @@
 #include "Board.h"
 #include "search.cpp"
 #include "uci.h"
+#include "Move.h"
 
 /*
  * The main I/O loop for gameplay with the UCI protocol.
@@ -24,6 +25,7 @@ void uci_loop() {
     Board board;
     SearchInfo info;
 
+
     do {
         std::getline(std::cin, cmd);
         std::istringstream is(cmd);
@@ -34,12 +36,17 @@ void uci_loop() {
         if (token == "uci") {
             std::cout << "id name " << NAME << ' ' << VERSION_MAJOR << '.' << VERSION_MINOR << std::endl;
             std::cout << "id author " << AUTHOR << std::endl;
+
+            std::cout << "option name Hash value 64" << std::endl;
+
             std::cout << "uciok" << std::endl;
         }
         else if (token == "isready")
             std::cout << "readyok" << std::endl;
         else if (token == "position")
             uci_parse_pos(board, std::move(is));
+        else if (token == "setoption")
+            uci_parse_setoption(board, std::move(is));
         else if (token == "ucinewgame") {
             std::string POSITION_STARTPOS = "startpos";
             std::istringstream isng(POSITION_STARTPOS);
@@ -79,15 +86,15 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
         }
         else if (token == "movestogo") {
             is >> token;
-            movestogo = std::stoi(token);
+            movestogo = std::stoi(token); // moves until next time control
         }
         else if (token == "movetime") {
             is >> token;
-            movetime = std::stoi(token);
+            movetime = std::stoi(token); // search exactly movetime seconds
         }
         else if (token == "depth") {
             is >> token;
-            depth = std::stoi(token);
+            depth = std::stoi(token); // search only up to depth plies
         }
     }
 
@@ -102,7 +109,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
     if (time != -1) {
         info.time_set = true;
         time /= movestogo;
-        time -= 50;  // Cushion to be safe.
+        time -= 25;  // Cushion to be safe.
         info.stop_time = info.start_time + time + inc;
     }
 
@@ -130,15 +137,23 @@ void uci_parse_pos(Board &board, std::istringstream is) {
     } else
         return;
 
-    board.setUp(fen);
+    board.initialize(fen);
 
     while (is >> token) {
-        m = board.getMove(token);
-        board.makeMove(m);
+        m = Move::from_str(token, board);
+        board.make_move(m);
         board.ply = 0;
     }
 }
 
-
+void uci_parse_setoption(Board &board, std::istringstream is) {
+    std::string token;
+    is >> token;  // Skip "name".
+    is >> token;
+    if (token == "Hash") {
+        is >> token;  // Hash size in MB.
+        board.resize_pv_table(std::stoi(token) * 0x100000);
+    }
+}
 
 

@@ -4,14 +4,12 @@
 // https://www.youtube.com/watch?v=x9sPmLt-EBM&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=3
 //
 
-#include <array>
-
 #ifndef ATHENE_DEFS_H
 #define ATHENE_DEFS_H
 
 #define NAME "prometheus"
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "1"
+#define VERSION_MINOR "2"
 #define AUTHOR "Alex Gisi"
 
 typedef unsigned long long u64;
@@ -111,10 +109,5 @@ const int castlePermArr[120] = {
 #define isRQ(p) (pieceRookQueen[(p)])
 #define isKn(p) (pieceKnight[(p)])
 #define isKi(p) (pieceKing[(p)])
-
-/* FILES */
-#define PERFTRESULTSPATH "../test/perftsuite.epd"
-
-const std::array<int, 64> ZERO_PST = { 0 };
 
 #endif //ATHENE_DEFS_H
