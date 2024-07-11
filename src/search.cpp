@@ -257,15 +257,6 @@ inline void search(Board& board, SearchInfo& info) {
         pv_moves = board.update_pv_line(current_depth);
         best_move = board.pvArray[0];
 
-//        if (pv_moves > 0) {
-//            best_move = board.pvArray[0];
-//        } else {
-//            auto start = get_time();
-//            best_move = MoveGen(&board).generate_a_legal_move();
-//            auto end = get_time();
-//            std::cout << "------used random move in " << end - start << "ms" << std::endl;
-//        }
-
         // Be sure best_move has been populated before this hits.
         if(info.stopped)
             break;

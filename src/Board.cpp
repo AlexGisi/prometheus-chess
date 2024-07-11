@@ -908,16 +908,10 @@ int Board::update_pv_line(const int depth) {
 
     std::optional<PVTable::PVEntry> mv_opt = pvTable.probe(posKey);
     int count = 0;
-    while (mv_opt && count < depth) {
-        assert(count < MAX_DEPTH);
-
-        if(MoveGen(this).is_move_valid(mv_opt.value().move.move)) {
-            make_move(mv_opt.value().move.move);
-            pvArray[count++] = mv_opt.value().move.move;
-        } else {
-            break;
-        }
-
+    while (mv_opt && MoveGen(this).is_move_valid(mv_opt.value().move.move)) {
+        assert(depth < MAX_DEPTH);
+        make_move(mv_opt.value().move.move);
+        pvArray[count++] = mv_opt.value().move.move;
         mv_opt = pvTable.probe(posKey);
     }
 
