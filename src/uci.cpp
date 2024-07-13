@@ -63,7 +63,7 @@ void uci_loop() {
 
 void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
     std::string token;
-    int depth = -1, movestogo = 30, movetime = -1;
+    int depth = -1, alpha = 30, movetime = -1;
     int time = -1, inc = 0;
     info.time_set = false;
 
@@ -86,7 +86,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
         }
         else if (token == "movestogo") {
             is >> token;
-            movestogo = std::stoi(token); // moves until next time control
+            alpha = std::stoi(token); // moves until next time control
         }
         else if (token == "movetime") {
             is >> token;
@@ -100,7 +100,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
 
     if (movetime != -1) {
         time = movetime;
-        movestogo = 1;
+        alpha = 1;
     }
 
     info.start_time = get_time();
@@ -108,7 +108,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
 
     if (time != -1) {
         info.time_set = true;
-        time /= movestogo;
+        time /= alpha;
         time -= 25;  // Cushion to be safe.
         info.stop_time = info.start_time + time + inc;
     }

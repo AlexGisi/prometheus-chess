@@ -224,7 +224,7 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
 
     if(legal == 0) {
         if(board.sq_attacked(board.kingSq[board.side], board.side ^ 1))
-            return -MATE + board.ply;
+            return -SHORTEST_MATE + board.ply;
         else
             return 0;
     }
@@ -268,6 +268,10 @@ inline void search(Board& board, SearchInfo& info) {
             printf(" %s", board.pvArray[pv_num].to_str().c_str());
         }
         std::cout << std::endl;
+
+        if (best_score > MATE) {
+            break;
+        }
 
         // Measure of move ordering effectiveness; >0.9 is good
         // printf("Ordering:%.2f\n", info.fhf / info.fh);

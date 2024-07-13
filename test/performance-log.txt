@@ -26,3 +26,10 @@ Elo difference: -417.32 +/- 34.75, LOS: 0.00 %, DrawRatio: 6.80 %
 iter=10, depth=8, depth=3
 kNPS 95% confidence interval: ((1625, 1725))
 
+4322422a34e02a8bd756a3f67c4af1115a7806fb
+pushed to lichess 2024-7-9
+
+iter=20, depth=8, depth=3
+kNPS 95% confidence interval: ((1855, 1882))
+
+
