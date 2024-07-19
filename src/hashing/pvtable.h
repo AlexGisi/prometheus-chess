@@ -7,9 +7,9 @@
 
 #include <optional>
 #include <memory>
-#include "Defs.h"
-#include "Move.h"
-#include "PosKey.h"
+#include "../defs.h"
+#include "../move/move.h"
+#include "poskey.h"
 
 
 enum class EntryFlag { HFNONE, HFALPHA, HFBETA, HFEXACT };

@@ -4,10 +4,10 @@
 
 #include <memory>
 #include <cassert>
-#include "MoveGen.h"
-#include "Move.h"
-#include "Board.h"
-#include "assertions.cpp"
+#include "movegen.h"
+#include "move.h"
+#include "../board/board.h"
+#include "../util/assertions.cpp"
 
 MoveGen::MoveGen(Board* b) {
     board = b;

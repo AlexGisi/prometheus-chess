@@ -7,11 +7,11 @@
 #include <sstream>
 #include <iostream>
 #include <thread>
-#include "Defs.h"
-#include "Board.h"
-#include "search.cpp"
+#include "../defs.h"
+#include "../board/board.h"
+#include "../search/search.cpp"
 #include "uci.h"
-#include "Move.h"
+#include "../move/move.h"
 
 /*
  * The main I/O loop for gameplay with the UCI protocol.

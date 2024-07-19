@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <chrono>
-#include "Defs.h"
+#include "../defs.h"
 
 /*
  * Return functional components of a line in the perft results (.epd)

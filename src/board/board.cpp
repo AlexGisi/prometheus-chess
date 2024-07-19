@@ -8,10 +8,10 @@
 #include <fstream>
 #include <cassert>
 #include <optional>
-#include "Board.h"
-#include "MoveGen.h"
-#include "assertions.cpp"
-#include "util.cpp"
+#include "board.h"
+#include "../move/movegen.h"
+#include "../util/assertions.cpp"
+#include "../util/util.cpp"
 
 Board::Board() {
     initialize();
@@ -577,7 +577,7 @@ void Board::clear_piece(const int sq) {
     int index = 0;
     int t_pceNum = -1;
 
-    posKey.hashPce(pce, sq);
+    posKey.hash_piece(pce, sq);
 
     pieces[sq] = EMPTY;
     material[col] -= pieceVal[pce];
@@ -613,7 +613,7 @@ void Board::add_piece(const int sq, const int pce) {
 
     int col = pieceCol[pce];
 
-    posKey.hashPce(pce, sq);
+    posKey.hash_piece(pce, sq);
 
     pieces[sq] = pce;
 
@@ -641,10 +641,10 @@ void Board::move_piece(const int from, const int to) {
 
     int t_pieceNum = false;
 
-    posKey.hashPce(pce, from);
+    posKey.hash_piece(pce, from);
     pieces[from] = EMPTY;
 
-    posKey.hashPce(pce, to);
+    posKey.hash_piece(pce, to);
     pieces[to] = pce;
 
     if(!pieceBig[pce]) {
@@ -702,8 +702,8 @@ bool Board::make_move(Move& move) {
         }
     }
 
-    if(enPas != NO_SQ) posKey.hashEp(enPas);
-    posKey.hashCa(castlePerm);
+    if(enPas != NO_SQ) posKey.hash_ep(enPas);
+    posKey.hash_castle(castlePerm);
 
     history[hisPly].move = move;
     history[hisPly].fiftyMove = fiftyMove;
@@ -714,7 +714,7 @@ bool Board::make_move(Move& move) {
     castlePerm &= castlePermArr[to];
     enPas = NO_SQ;
 
-    posKey.hashCa(castlePerm);
+    posKey.hash_castle(castlePerm);
 
     fiftyMove++;
 
@@ -738,7 +738,7 @@ bool Board::make_move(Move& move) {
                 enPas = from-10;
                 assert(ranksBrd[enPas] == RANK_6);
             }
-            posKey.hashEp(enPas);
+            posKey.hash_ep(enPas);
         }
     }
 
@@ -757,7 +757,7 @@ bool Board::make_move(Move& move) {
     }
 
     side ^= 1;
-    posKey.hashSide();
+    posKey.hash_side();
 
     assert(check_board());
 

@@ -6,9 +6,9 @@
 //
 
 #include <iostream>
-#include "BitBoard.h"
-#include "Board.h"
-#include "Defs.h"
+#include "bitboard.h"
+#include "board.h"
+#include "../defs.h"
 
 BitBoard::BitBoard() {
     val = 0ULL;

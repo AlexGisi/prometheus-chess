@@ -6,8 +6,8 @@
 #define ATHENE_MOVE_H
 
 #include <string>
-#include "Defs.h"
-#include "assertions.cpp"
+#include "../defs.h"
+#include "../util/assertions.cpp"
 
 class Board;
 

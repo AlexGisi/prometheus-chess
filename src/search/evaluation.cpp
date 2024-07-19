@@ -3,9 +3,9 @@
 //
 
 #include <cassert>
-#include "Defs.h"
-#include "Board.h"
-#include "assertions.cpp"
+#include "../defs.h"
+#include "../board/board.h"
+#include "../util/assertions.cpp"
 
 // Piece-square tables, in centipawns.
 const int pawnTable[64] = {

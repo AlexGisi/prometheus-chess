@@ -4,10 +4,10 @@
 
 #include <iostream>
 #include <cassert>
-#include "Board.h"
-#include "util.cpp"
+#include "../board/board.h"
+#include "../util/util.cpp"
 #include "evaluation.cpp"
-#include "MoveGen.h"
+#include "../move/movegen.h"
 
 typedef struct {
     u64 start_time;

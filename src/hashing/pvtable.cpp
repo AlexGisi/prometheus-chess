@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <climits>
-#include "PVTable.h"
+#include "pvtable.h"
 
 /*
  * Creates a hash table with a specified size (in bytes) in memory.

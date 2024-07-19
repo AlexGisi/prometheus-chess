@@ -6,11 +6,11 @@
 #define ATHENE_BOARD_H
 
 #include <string>
-#include "BitBoard.h"
-#include "Defs.h"
-#include "PosKey.h"
-#include "Move.h"
-#include "PVTable.h"
+#include "bitboard.h"
+#include "../defs.h"
+#include "../hashing/poskey.h"
+#include "../move/move.h"
+#include "../hashing/pvtable.h"
 
 class Board {
 public:

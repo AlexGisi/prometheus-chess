@@ -1,11 +1,11 @@
 #include <iostream>
-#include "Board.h"
-#include "Defs.h"
-#include "PosKey.h"
-#include "Move.h"
-#include "MoveGen.h"
-#include "search.cpp"
-#include "uci.h"
+#include "board/board.h"
+#include "defs.h"
+#include "hashing/poskey.h"
+#include "move/move.h"
+#include "move/movegen.h"
+#include "search/search.cpp"
+#include "io/uci.h"
 
 #define fen1 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 #define mate_in_3 "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
@@ -16,7 +16,7 @@ using namespace std;
 void init() {
     Board::initialize_lookup_tables();
     BitBoard::initBitMasks();
-    PosKey::initHashKeys();
+    PosKey::init_hash_keys();
     MoveGen::init_mvv_lva();
 }
 
