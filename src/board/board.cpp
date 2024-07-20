@@ -880,7 +880,7 @@ void Board::perft_suite(int depth, const std::string& resultsfile) {
             pass_num++;
         line_num++;
     }
-    std::cout << '\n' << "Passed " << pass_num << '/' << "126" << std::endl;
+    std::cout << '\n' << "Passed " << pass_num << '/' << line_num-1 << std::endl;
 }
 
 bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct) {

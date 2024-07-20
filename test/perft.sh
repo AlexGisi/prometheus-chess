@@ -1,17 +1,10 @@
 #!/bin/bash
 
+ENGINE=$ENGINE_RELEASE
+
 # Make sure the config file was sourced.
 if [[ -z "$ENGINE_DEBUG" ]]; then
   echo "Need to source config.sh."
-  exit 1
-fi
-
-if [[ $1 == "release" ]]; then
-  ENGINE=$ENGINE_RELEASE
-elif [[ $1 == "debug" ]]; then
-  ENGINE=$ENGINE_DEBUG
-else
-  echo "Invalid mode. Please specify 'release' or 'debug'."
   exit 1
 fi
 
@@ -21,11 +14,19 @@ else
   DEPTH=$(( $2 ))
 fi
 
-# Assign the command to a variable
-res=$($ENGINE perft "$DEPTH" "$RESULTS")
-last=$(echo "$res" | tail -n 1)
+echo "Perft to depth $DEPTH..."
 
-# Compare the last line to the expected string
-if [[ "$last" != "Passed 126/126" ]]; then
-  echo "$res"
-fi
+res=$($ENGINE perft "$DEPTH" "$RESULTS")
+
+# Process the output
+while IFS= read -r line; do
+  if [[ "$line" == *"FAIL"* ]]; then
+    echo "$line"
+  fi
+  if [[ "$line" =~ ^Passed\ [0-9]+\/[0-9]+$ ]]; then
+    summary="$line"
+  fi
+done <<< "$res"
+
+# Print the summary at the end
+echo "$summary"
