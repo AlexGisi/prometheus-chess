@@ -25,19 +25,14 @@ prometheus has a bot account on lichess: https://lichess.org/@/prometheus-bot
 - Move generation
 - Do/undo moves
 - Perft testing
-- Principal variation table
+- Hash/principal variation table
 - Move Search
 - UCI communication
 
 # To-Do
-- Profiling
 - Improve quiescence
-- Hash table
-- Advanced position evaluation
-- Speed optimization
-
-# Ideas
-- Learn optimal piece-square tables
+- Improve position evaluation
+- Optimization
 
 # Acknowledgment
 The board representation and move generation adapts [Bluefever Software's](https://www.youtube.com/channel/UCFkfibjxPzrP0e2WIa8aJCg) "Programming a Chess Engine in C".
