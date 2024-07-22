@@ -21,15 +21,20 @@ public:
     explicit operator bool() const;
 
     void print() const;
-    int popBit();
-    int countBits() const;
+    int pop();
+    [[nodiscard]] int count() const;
 
-    void clearBit(int sq);
-    void setBit(int sq);
+    inline void clear_bit(int sq) {
+        assert(sq >= 0);
+        assert(sq <= 63);
+        val &= ~(1ULL << sq);
+    }
 
-    static uint64_t setMask[64];
-    static uint64_t clearMask[64];
-    static void initBitMasks();
+    inline void set_bit(int sq) {
+        assert(sq >= 0);
+        assert(sq <= 63);
+        val |= (1ULL << sq);
+    }
 
 private:
     uint64_t val;

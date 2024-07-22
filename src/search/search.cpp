@@ -51,12 +51,12 @@ inline void prepSearch(Board& board, SearchInfo& info) {
  * Searching from the index move_idx, switch the move at move_idx with the best
  * move in ml.
  */
-inline void pickNextMove(int move_idx, MoveListPtr& ml) {
+inline void pickNextMove(size_t move_idx, MoveListPtr& ml) {
     SearchMove temp;
     int best_score = 0;
-    int best_idx = move_idx;
+    size_t best_idx = move_idx;
 
-    for(int i=move_idx; i < ml->size(); i++) {
+    for(size_t i=move_idx; i < ml->size(); i++) {
         if(ml->at(i).score > best_score) {
             best_score = ml->at(i).score;
             best_idx = i;
@@ -102,7 +102,17 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     score = -INFINITE;
     std::optional<PVTable::PVEntry> pv_move = board.pvTable.probe(board.posKey);
 
-    for(int i = 0; i < ml->size(); i++) {
+    // Ensure we search the PV line first.
+    if(pv_move) {
+        for(auto & i : *ml) {
+            if(i.move == pv_move.value().move.move) {
+                i.score = 2000000;
+                break;
+            }
+        }
+    }
+
+    for(size_t i = 0; i < ml->size(); i++) {
         pickNextMove(i, ml);
 
         if(!board.make_move(ml->at(i).move))
@@ -134,7 +144,7 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     return alpha;
 }
 
-inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& info, int doNull) {
+inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInfo& info, int doNull) {
     assert(board.check_board());
 
     if(depth == 0) {
@@ -177,7 +187,7 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
         }
     }
 
-    for(int i = 0; i < ml->size(); i++) {
+    for(size_t i = 0; i < ml->size(); i++) {
         pickNextMove(i, ml);
 
         if(!board.make_move(ml->at(i).move))
@@ -244,7 +254,7 @@ inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& i
 inline void search(Board& board, SearchInfo& info) {
     Move best_move;
     int best_score = -INFINITE;
-    int current_depth = 0;
+    uint8_t current_depth = 0;
     int pv_moves = 0;
     int pv_num = 0;
 
@@ -255,16 +265,8 @@ inline void search(Board& board, SearchInfo& info) {
 
         // Need to be sure some move has been inserted into table before this.
         pv_moves = board.update_pv_line(current_depth);
+        assert(pv_moves != 0);
         best_move = board.pvArray[0];
-
-//        if (pv_moves > 0) {
-//            best_move = board.pvArray[0];
-//        } else {
-//            auto start = get_time();
-//            best_move = MoveGen(&board).generate_a_legal_move();
-//            auto end = get_time();
-//            std::cout << "------used random move in " << end - start << "ms" << std::endl;
-//        }
 
         // Be sure best_move has been populated before this hits.
         if(info.stopped)

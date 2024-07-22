@@ -8,10 +8,10 @@ if [[ -z "$ENGINE_DEBUG" ]]; then
   exit 1
 fi
 
-if [[ -z $2 ]]; then
+if [[ -z $1 ]]; then
   DEPTH=4
 else
-  DEPTH=$(( $2 ))
+  DEPTH=$(( $1 ))
 fi
 
 echo "Perft to depth $DEPTH..."

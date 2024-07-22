@@ -15,7 +15,6 @@ using namespace std;
 
 void init() {
     Board::initialize_lookup_tables();
-    BitBoard::initBitMasks();
     PosKey::init_hash_keys();
     MoveGen::init_mvv_lva();
 }

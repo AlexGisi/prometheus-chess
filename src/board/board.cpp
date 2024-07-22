@@ -180,11 +180,11 @@ void Board::initialize(const std::string& fen) {
             if(piece == bK) kingSq[BLACK] = sq;
 
             if(piece == wP) {
-                pawns[WHITE].setBit(sq120ToSq64[sq]);
-                pawns[BOTH].setBit(sq120ToSq64[sq]);
+                pawns[WHITE].set_bit(sq120ToSq64[sq]);
+                pawns[BOTH].set_bit(sq120ToSq64[sq]);
             } else if(piece == bP) {
-                pawns[BLACK].setBit(sq120ToSq64[sq]);
-                pawns[BOTH].setBit(sq120ToSq64[sq]);
+                pawns[BLACK].set_bit(sq120ToSq64[sq]);
+                pawns[BOTH].set_bit(sq120ToSq64[sq]);
             }
         }
     }
@@ -412,24 +412,24 @@ bool Board::check_board() const {
         assert(t_pceNum[t_piece] == pceNum[t_piece]);
 
     // Check bitboard counts.
-    p_count = t_pawns[WHITE].countBits();
+    p_count = t_pawns[WHITE].count();
     assert(p_count == pceNum[wP]);
-    p_count = t_pawns[BLACK].countBits();
+    p_count = t_pawns[BLACK].count();
     assert(p_count == pceNum[bP]);
-    p_count = t_pawns[BOTH].countBits();
+    p_count = t_pawns[BOTH].count();
     assert(p_count == (pceNum[wP] + pceNum[bP]));
 
     // Check bitboard squares.
     while(t_pawns[WHITE]) {
-        sq64 = t_pawns[WHITE].popBit();
+        sq64 = t_pawns[WHITE].pop();
         assert(pieces[sq64ToSq120[sq64]] == wP);
     }
     while(t_pawns[BLACK]) {
-        sq64 = t_pawns[BLACK].popBit();
+        sq64 = t_pawns[BLACK].pop();
         assert(pieces[sq64ToSq120[sq64]] == bP);
     }
     while(t_pawns[BOTH]) {
-        sq64 = t_pawns[BOTH].popBit();
+        sq64 = t_pawns[BOTH].pop();
         assert( (pieces[sq64ToSq120[sq64]] == wP) || (pieces[sq64ToSq120[sq64]] == bP) );
     }
 
@@ -523,11 +523,11 @@ void Board::print_squares_attacked(int att_side) const {
     int file = 0;
     int sq = 0;
 
-    printf("\n\nSquares attacked by:%c\n", sideChar[side]);
+    printf("\n\nSquares attacked by:%c\n", sideChar[att_side]);
     for(rank = RANK_8; rank >= RANK_1; --rank) {
         for(file = FILE_A; file <= FILE_H; ++file) {
             sq = FR2SQ(file,rank);
-            if(sq_attacked(sq, side)) {
+            if(sq_attacked(sq, att_side)) {
                 printf("X");
             } else {
                 printf("-");
@@ -589,8 +589,8 @@ void Board::clear_piece(const int sq) {
         else
             minPce[col]--;
     } else {
-        pawns[col].clearBit(sq120ToSq64[sq]);
-        pawns[BOTH].clearBit(sq120ToSq64[sq]);
+        pawns[col].clear_bit(sq120ToSq64[sq]);
+        pawns[BOTH].clear_bit(sq120ToSq64[sq]);
     }
 
     // Remove piece from piece list; see
@@ -624,8 +624,8 @@ void Board::add_piece(const int sq, const int pce) {
         else
             minPce[col]++;
     } else {
-        pawns[col].setBit(sq120ToSq64[sq]);
-        pawns[BOTH].setBit(sq120ToSq64[sq]);
+        pawns[col].set_bit(sq120ToSq64[sq]);
+        pawns[BOTH].set_bit(sq120ToSq64[sq]);
     }
     material[col] += pieceVal[pce];
     pceList[pce][pceNum[pce]++] = sq;
@@ -648,10 +648,10 @@ void Board::move_piece(const int from, const int to) {
     pieces[to] = pce;
 
     if(!pieceBig[pce]) {
-        pawns[col].clearBit(sq120ToSq64[from]);
-        pawns[BOTH].clearBit(sq120ToSq64[from]);
-        pawns[col].setBit(sq120ToSq64[to]);
-        pawns[BOTH].setBit(sq120ToSq64[to]);
+        pawns[col].clear_bit(sq120ToSq64[from]);
+        pawns[BOTH].clear_bit(sq120ToSq64[from]);
+        pawns[col].set_bit(sq120ToSq64[to]);
+        pawns[BOTH].set_bit(sq120ToSq64[to]);
     }
 
     for(idx = 0; idx < pceNum[pce]; ++idx) {
@@ -872,7 +872,7 @@ void Board::perft_suite(int depth, const std::string& resultsfile) {
     while(std::getline(infile, line)) {
         std::vector<std::string> l = parse_epd_line(line);
         std::string fen = l[0];
-        for(int i=0; i < 6; i++)
+        for(size_t i=0; i < 6; i++)
             correct[i] = std::stoull(l[i+1]);
 
         std::cout << line_num << ": ";
@@ -946,7 +946,7 @@ bool Board::is_repetition() const {
     return count >= 2;
 }
 
-void Board::resize_pv_table(int size) {
+void Board::resize_pv_table(size_t size) {
     pvTable = pvTable.resize(size);
 }
 

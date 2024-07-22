@@ -110,7 +110,8 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
         info.time_set = true;
         time /= alpha;
         time -= 25;  // Cushion to be safe.
-        info.stop_time = info.start_time + time + inc;
+        info.stop_time = info.start_time + static_cast<unsigned long long int>(time) +
+                         static_cast<unsigned long long int>(inc);
     }
 
     if (depth == -1)
@@ -152,7 +153,7 @@ void uci_parse_setoption(Board &board, std::istringstream is) {
     is >> token;
     if (token == "Hash") {
         is >> token;  // Hash size in MB.
-        board.resize_pv_table(std::stoi(token) * 0x100000);
+        board.resize_pv_table(std::stoul(token) * 0x100000);
     }
 }
 
