@@ -6,8 +6,8 @@
 #define ATHENE_MOVEGEN_H
 
 #include <vector>
-#include "Defs.h"
-#include "Move.h"
+#include "../defs.h"
+#include "move.h"
 
 class Board;
 

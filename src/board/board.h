@@ -6,11 +6,11 @@
 #define ATHENE_BOARD_H
 
 #include <string>
-#include "BitBoard.h"
-#include "Defs.h"
-#include "PosKey.h"
-#include "Move.h"
-#include "PVTable.h"
+#include "bitboard.h"
+#include "../defs.h"
+#include "../hashing/poskey.h"
+#include "../move/move.h"
+#include "../hashing/pvtable.h"
 
 class Board {
 public:
@@ -94,7 +94,7 @@ public:
     Move searchKillers[2][MAX_DEPTH];
 
     void prep_search();
-    void resize_pv_table(int size);
+    void resize_pv_table(size_t size);
 
     // Making moves.
     void clear_piece(int sq);

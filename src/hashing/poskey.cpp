@@ -5,9 +5,9 @@
 #include <random>
 #include <cmath>
 #include <cassert>
-#include "PosKey.h"
-#include "Defs.h"
-#include "Board.h"
+#include "poskey.h"
+#include "../defs.h"
+#include "../board/board.h"
 
 PosKey::PosKey() {
     val = 0;
@@ -56,10 +56,10 @@ uint64_t PosKey::rand_64() {
     std::mt19937_64 e2(rd());
 
     std::uniform_int_distribution<long long int> dist(std::llround(std::pow(2, 61)), std::llround(std::pow(2, 62)));
-    return dist(e2);
+    return static_cast<uint64_t>(dist(e2));
 }
 
-void PosKey::initHashKeys() {
+void PosKey::init_hash_keys() {
     int idx = 0;
     int idx2 = 0;
     for(idx = 0; idx < 13; ++idx) {
@@ -75,19 +75,19 @@ PosKey::PosKey(const PosKey &rhs) {
     val = rhs.val;
 }
 
-void PosKey::hashPce(const int pce, const int sq) {
+void PosKey::hash_piece(const int pce, const int sq) {
     val ^= pieceKeys[pce][sq];
 }
 
-void PosKey::hashCa(int castlePerm) {
+void PosKey::hash_castle(int castlePerm) {
     val ^= castleKeys[castlePerm];
 }
 
-void PosKey::hashSide() {
+void PosKey::hash_side() {
     val ^= sideKey;
 }
 
-void PosKey::hashEp(int enPas) {
+void PosKey::hash_ep(int enPas) {
     val ^= pieceKeys[EMPTY][enPas];
 }
 

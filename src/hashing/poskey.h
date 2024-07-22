@@ -22,13 +22,13 @@ public:
     bool operator==(const PosKey& rhs) const;
     bool operator!=(const PosKey& rhs) const;
 
-    static void initHashKeys();
+    static void init_hash_keys();
 
     // In-place updates to the key.
-    void hashPce(int pce, int sq);
-    void hashCa(int castlePerm);
-    void hashSide();
-    void hashEp(int enPas);
+    void hash_piece(int pce, int sq);
+    void hash_castle(int castlePerm);
+    void hash_side();
+    void hash_ep(int enPas);
 
     // Keys for possible states, random number for each state.
     static uint64_t pieceKeys[13][120];

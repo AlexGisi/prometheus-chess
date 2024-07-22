@@ -16,9 +16,9 @@
 
 #include <cassert>
 #include <sstream>
-#include "Move.h"
-#include "Board.h"
-#include "MoveGen.h"
+#include "move.h"
+#include "../board/board.h"
+#include "movegen.h"
 
 Move::Move() {
     move = 0;

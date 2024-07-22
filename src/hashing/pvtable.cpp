@@ -4,18 +4,18 @@
 
 #include <cassert>
 #include <climits>
-#include "PVTable.h"
+#include "pvtable.h"
 
 /*
  * Creates a hash table with a specified size (in bytes) in memory.
  */
-PVTable::PVTable(int size) {
-    entries = ( size / (int) sizeof(PVEntry) ) - 2;  // Subtract two to avoid any out-of-bounds.
+PVTable::PVTable(size_t size) {
+    entries = ( size / sizeof(PVEntry) ) - 2;  // Subtract two to avoid any out-of-bounds.
     table = std::make_unique<PVEntry[]>(size / (int) sizeof(PVEntry));
 }
 
 void PVTable::clear() {
-    for(int i=0; i < entries; i++) {
+    for(size_t i=0; i < entries; i++) {
         table[i] = PVEntry();
     }
     new_write = 0;
@@ -60,7 +60,7 @@ PVTable& PVTable::operator=(const PVTable &rhs) {
  * Ref: https://stackoverflow.com/a/11387425/5127535
  */
 void PVTable::store(const PosKey& key, PVEntry value) {
-    int idx = hash(key);
+    uint64_t idx = hash(key);
     assert(idx >= 0 && idx <= entries-1);
     assert(value.full == true);
     assert(value.move.move.move != 0);
@@ -88,7 +88,7 @@ void PVTable::store(const PosKey& key, PVEntry value) {
  * Ref: https://stackoverflow.com/a/11387425/5127535
  */
 std::optional<PVTable::PVEntry> PVTable::probe(const PosKey &key) {
-    int idx = hash(key);
+    uint64_t idx = hash(key);
     assert(idx >= 0 && idx <= entries-1);
 
     if (table[idx].full && table[idx].posKey == key)
@@ -97,9 +97,9 @@ std::optional<PVTable::PVEntry> PVTable::probe(const PosKey &key) {
         return {};
 }
 
-PVTable PVTable::resize(int new_size) {
+PVTable PVTable::resize(size_t new_size) {
     PVTable new_table(new_size);
-    for (int i=0; i < entries; i++) {
+    for (size_t i=0; i < entries; i++) {
         if (table[i].full) {
             new_table.store(table[i].posKey, table[i]);
         }
@@ -111,7 +111,7 @@ PVTable PVTable::resize(int new_size) {
 std::optional<SearchMove> PVTable::probe_move(const PosKey& key, int alpha, int beta, int depth) {
     Move move;
     int score;
-    int idx = hash(key);
+    uint64_t idx = hash(key);
 
     assert(idx >= 0 && idx <= entries-1);
     assert(depth >= 1 && depth <= MAX_DEPTH);
@@ -153,6 +153,6 @@ std::optional<SearchMove> PVTable::probe_move(const PosKey& key, int alpha, int 
     return {{move, score}};
 }
 
-int PVTable::hash(const PosKey &key) const {
-    return (int) (key.val & INT_MAX) % entries;
+uint64_t PVTable::hash(const PosKey &key) const {
+    return (key.val & INT_MAX) % entries;
 }

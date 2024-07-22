@@ -2,7 +2,7 @@
 // Created by Alex Gisi on 3/24/22.
 //
 
-#include "Defs.h"
+#include "../defs.h"
 
 #ifndef ATHENE_ASSERTIONS_CPP
 #define ATHENE_ASSERTIONS_CPP

@@ -6,9 +6,8 @@
 //
 
 #include <iostream>
-#include "BitBoard.h"
-#include "Board.h"
-#include "Defs.h"
+#include "bitboard.h"
+#include "board.h"
 
 BitBoard::BitBoard() {
     val = 0ULL;
@@ -52,40 +51,18 @@ void BitBoard::print() const {
 /*
  * Remove the least significant '1' in the bitboard. Return the index.
  */
-int BitBoard::popBit() {
+int BitBoard::pop() {
     uint64_t b = val ^ (val-1);
     auto fold = (unsigned) ((b & 0xffffffff) ^ (b >> 32));
     val &= (val-1);
     return BitTable[(fold * 0x783a9b23) >> 26];
 }
 
-int BitBoard::countBits() const {
+int BitBoard::count() const {
     uint64_t b = val;
     int r = 0;
     for( ; b; r++, b &= b-1);
     return r;
-}
-
-void BitBoard::initBitMasks() {
-    int index = 0;
-
-    for(index = 0; index < 64; index++) {
-        setMask[index] = 0ULL;
-        clearMask[index] = 0ULL;
-    }
-
-    for(index = 0; index < 64; index++) {
-        setMask[index] |= (1ULL << index);
-        clearMask[index] = ~setMask[index];
-    }
-}
-
-void BitBoard::clearBit(int sq) {
-    val &= clearMask[sq];
-}
-
-void BitBoard::setBit(int sq) {
-    val |= setMask[sq];
 }
 
 bool BitBoard::operator==(const BitBoard &rhs) const {
@@ -99,7 +76,3 @@ bool BitBoard::operator!=(const BitBoard &rhs) const {
 BitBoard::operator bool() const {
     return val != 0;
 }
-
-
-uint64_t BitBoard::setMask[64];
-uint64_t BitBoard::clearMask[64];

@@ -4,8 +4,8 @@ import numpy as np
 import scipy.stats as st
 
 VERBOSE = False
-ITER = 20
-DEPTH = 8  # Must be > 2
+ITER = 50
+DEPTH = 6  # Must be > 2
 DEPTHS = 3  # Last n iterations to use
 engine_path = os.getenv('ENGINE_RELEASE')
 
@@ -73,10 +73,9 @@ def get_average():
 
 # https://stackoverflow.com/questions/15033511/compute-a-confidence-interval-from-sample-data
 def confidence_interval(data, confidence=0.95):
-    return st.t.interval(confidence,
-                         len(data)-1,
-                         loc=np.mean(data),
-                         scale=st.sem(data))
+    return st.norm.interval(confidence,
+                            loc=np.mean(data),
+                            scale=np.std(data)/np.sqrt(len(data)))
 
 
 if __name__ == '__main__':

@@ -23,6 +23,8 @@ typedef unsigned long long u64;
 
 #define INFINITE 30000
 #define MATE 29000
+#define SHORTEST_MATE 29256
+#define MATE_IN_ONE_SCORE 29255
 
 // Useful for printing the board.
 const char pceChar[] = ".PNBRQKpnbrqk";

@@ -4,10 +4,10 @@
 
 #include <memory>
 #include <cassert>
-#include "MoveGen.h"
-#include "Move.h"
-#include "Board.h"
-#include "assertions.cpp"
+#include "movegen.h"
+#include "move.h"
+#include "../board/board.h"
+#include "../util/assertions.cpp"
 
 MoveGen::MoveGen(Board* b) {
     board = b;
@@ -403,7 +403,7 @@ void MoveGen::add_black_pawn_move(int from, int to, const MoveListPtr& list) {
 }
 
 /*
- * Returns whether the move is possible for the current board->
+ * Returns whether the move is possible for the current board.
  */
 bool MoveGen::is_move_valid(const Move& move) {
     auto ml = generate_all_moves();
