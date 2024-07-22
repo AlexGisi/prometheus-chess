@@ -6,7 +6,7 @@
 #define ATHENE_BITBOARD_H
 
 #include <cstdint>
-
+#include <cassert>
 
 class BitBoard {
 public:
