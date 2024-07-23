@@ -2,18 +2,6 @@
 // Created by Alex Gisi on 3/15/22.
 //
 
-/*
- * How we represent a game move in a (32-bit) integer:
- *
- * 0000 0000 0000 0000 0000 0111 1111 -> From square
- * 0000 0000 0000 0011 1111 1000 0000 -> To square
- * 0000 0000 0011 1100 0000 0000 0000 -> Captured piece
- * 0000 0000 0100 0000 0000 0000 0000 -> En Passant capture
- * 0000 0000 1000 0000 0000 0000 0000 -> Was pawn start
- * 0000 1111 0000 0000 0000 0000 0000 -> Indicate promotion: piece and side
- * 0001 0000 0000 0000 0000 0000 0000 -> Was a castle
- */
-
 #include <cassert>
 #include <sstream>
 #include "move.h"
@@ -74,44 +62,6 @@ Move::Move(const Move &rhs) {
 }
 
 Move& Move::operator=(const Move& rhs) = default;
-
-int Move::from() const {
-    return move & 0x7F;
-}
-
-int Move::to() const {
-    return (move >> 7) & 0x7F;
-}
-
-int Move::captured() const {
-    return (move >> 14) & 0xF;
-}
-
-int Move::promoted() const {
-    return (move >> 20) & 0xF;
-}
-
-bool Move::ep_capture() const {
-    return move & 0x40000;
-}
-
-bool Move::pawn_start() const {
-    return move & 0x80000;
-}
-
-bool Move::castle() const {
-    return move & 0x1000000;
-}
-
-// TODO: if used must add properr flag to moves in MoveGen.cpp
-bool Move::capture() const {
-    return move & 0x7C000;
-}
-
-// TODO: if used must add properr flag to moves in MoveGen.cpp
-bool Move::promotion() const {
-    return move & 0xF00000;
-}
 
 std::string Move::to_str() const {
     std::stringstream ss;
