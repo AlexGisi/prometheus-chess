@@ -103,7 +103,7 @@ public:
     void clear_piece(int sq);
     void add_piece(int sq, int pce);
     void move_piece(int from, int to);
-    bool make_move(Move& move);
+    bool make_move(const Move& move);
     void take_move();
     void make_move_null();
     void take_move_null();
@@ -114,7 +114,7 @@ public:
     bool perft_eval_pos(int depth, const std::string& fen, const uint64_t* correct);
 
     // Principal variation.
-    int update_pv_line(const uint8_t depth);
+    int update_pv_line(uint8_t depth);
 
     // Board status.
     [[nodiscard]] bool is_repetition() const;

@@ -670,7 +670,7 @@ void Board::move_piece(const int from, const int to) {
     assert(t_pieceNum);
 }
 
-bool Board::make_move(Move& move) {
+bool Board::make_move(const Move& move) {
     assert(check_board());
 
     int from = move.from();

@@ -14,7 +14,7 @@ class Board;
 class Move {
 public:
     Move();
-    explicit Move(int m);
+    explicit Move(uint32_t m);
     Move(int from, int to, int cap, int pro, int f1);
 
     Move(const Move& rhs);
@@ -34,10 +34,15 @@ public:
         return move == 0;
     }
 
+    [[nodiscard]] inline uint32_t to_uint32() const {
+        return move;
+    }
+
     [[nodiscard]] std::string to_str() const;
     static Move from_str(const std::string & move_str, Board & board);
 
-    int move;
+private:
+    uint32_t move;
 };
 
 class SearchMove {
