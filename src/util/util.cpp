@@ -33,7 +33,7 @@ inline std::vector<std::string> parse_epd_line(const std::string& line) {
 /*
  * Ref: https://stackoverflow.com/a/56107709/5127535
  */
-inline u64 get_time() {
+inline uint64_t get_time() {
     using namespace std::chrono;
-    return static_cast<u64>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
+    return static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
 }

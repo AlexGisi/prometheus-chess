@@ -22,3 +22,9 @@ Elo difference: -417.32 +/- 34.75, LOS: 0.00 %, DrawRatio: 6.80 %
 
 4322422a34e02a8bd756a3f67c4af1115a7806fb
 pushed to lichess 2024-7-9
+
+d01b1c710538e0e23448e7907c8cbdb4236d329b
+pushed to lichess 2024-7-22
+
+Score of prometheus_new vs vice: 61 - 847 - 92 [0.107] 1000
+Elo difference: -368.59 +/- 30.57, LOS: 0.00 %, DrawRatio: 9.20 %

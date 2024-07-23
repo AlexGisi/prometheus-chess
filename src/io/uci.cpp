@@ -104,7 +104,6 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
     }
 
     info.start_time = get_time();
-    info.depth = depth;
 
     if (time != -1) {
         info.time_set = true;
@@ -114,8 +113,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
                          static_cast<unsigned long long int>(inc);
     }
 
-    if (depth == -1)
-        info.depth = MAX_DEPTH;
+    info.depth = (depth == -1) ? MAX_DEPTH : static_cast<uint8_t>(depth);
 
     printf("time:%d start:%llu stop:%llu depth:%d timeset:%d",
            time,info.start_time,info.stop_time,info.depth,info.time_set);

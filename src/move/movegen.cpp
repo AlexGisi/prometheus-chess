@@ -414,7 +414,7 @@ bool MoveGen::is_move_valid(const Move& move) {
             continue;
         board->take_move();
 
-        if (i.move == mv)
+        if (i.move == move)
             return true;
     }
 

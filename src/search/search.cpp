@@ -10,15 +10,15 @@
 #include "../move/movegen.h"
 
 typedef struct {
-    u64 start_time;
-    u64 stop_time;
-    int depth;
+    uint64_t start_time;
+    uint64_t stop_time;
+    uint8_t depth;
     int depth_set;
     int time_set;
     int moves_to_go;
     bool infinite;
 
-    u64 nodes;
+    uint64_t nodes;
 
     bool quit;
     bool stopped;

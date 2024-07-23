@@ -104,12 +104,12 @@ public:
     void take_move();
 
     // Perft.
-    u64 perft(int depth);
+    uint64_t perft(int depth);
     void perft_suite(int depth, const std::string& resultsfile);
-    bool perft_eval_pos(int depth, const std::string& fen, const u64* correct);
+    bool perft_eval_pos(int depth, const std::string& fen, const uint64_t* correct);
 
     // Principal variation.
-    int update_pv_line(int depth);
+    int update_pv_line(const uint8_t depth);
 
     // Board status.
     [[nodiscard]] bool is_repetition() const;

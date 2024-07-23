@@ -380,7 +380,10 @@ bool Board::check_board() const {
     int t_minPce[2] = { 0, 0 };
     int t_material[2] = { 0, 0 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     int sq64, t_piece, t_pce_num, sq120, color, p_count;
+#pragma GCC diagnostic pop
     BitBoard t_pawns[3] = { BitBoard(), BitBoard(), BitBoard() };
 
     t_pawns[WHITE] = pawns[WHITE];
@@ -639,7 +642,10 @@ void Board::move_piece(const int from, const int to) {
     int pce = pieces[from];
     int col = pieceCol[pce];
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     int t_pieceNum = false;
+#pragma GCC diagnostic pop
 
     posKey.hash_piece(pce, from);
     pieces[from] = EMPTY;
@@ -843,7 +849,7 @@ u64 Board::perft(int depth) {
     if (depth == 0)
         return 1ULL;
 
-    u64 nodes = 0;
+    uint64_t nodes = 0;
     MoveGen mg(this);
     MoveListPtr ml = mg.generate_all_moves();
     for(auto & i : *ml) {
@@ -864,7 +870,7 @@ u64 Board::perft(int depth) {
 void Board::perft_suite(int depth, const std::string& resultsfile) {
     std::ifstream infile(resultsfile);
     std::string line;
-    u64 correct[6];
+    uint64_t correct[6];
     int line_num = 1;
     int pass_num = 0;
 
@@ -883,12 +889,12 @@ void Board::perft_suite(int depth, const std::string& resultsfile) {
     std::cout << '\n' << "Passed " << pass_num << '/' << line_num-1 << std::endl;
 }
 
-bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct) {
+bool Board::perft_eval_pos(int depth, const std::string& fen, const uint64_t* correct) {
     if (depth < 1 || depth > 6) throw std::invalid_argument("Depth should be between one and six.");
 
     initialize();
     initialize(fen);
-    u64 res = perft(depth);
+    uint64_t res = perft(depth);
 
     bool pass = (res == correct[depth-1]);
     if (pass)
@@ -903,7 +909,7 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const u64* correct
 /*
  * Update the pvArray variable based on the content of the pvTable.
  */
-int Board::update_pv_line(const int depth) {
+int Board::update_pv_line(const uint8_t depth) {
     assert(depth < MAX_DEPTH);
 
     std::optional<PVTable::PVEntry> mv_opt = pvTable.probe(posKey);
