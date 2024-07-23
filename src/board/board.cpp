@@ -776,6 +776,33 @@ bool Board::make_move(Move& move) {
     return true;
 }
 
+void Board::make_move_null() {
+    auto move = Move();
+
+    assert(move.is_no_move());
+    assert(check_board());
+
+    history[hisPly].posKey = posKey;
+
+    // todo: understand where enPas is set.
+    if(enPas != NO_SQ) posKey.hash_ep(enPas);
+    posKey.hash_castle(castlePerm);
+
+    history[hisPly].move = move;
+    history[hisPly].fiftyMove = fiftyMove;
+    history[hisPly].enPas = enPas;
+    history[hisPly].castlePerm = castlePerm;
+
+    enPas = NO_SQ;
+    fiftyMove++;
+    hisPly++;
+    ply++;
+    side ^= 1;
+    posKey.hash_side();
+
+    assert(check_board());
+}
+
 void Board::take_move() {
     assert(check_board());
 
@@ -837,6 +864,22 @@ void Board::take_move() {
         add_piece(from, pieceCol[pro] == WHITE ? wP : bP);
     }
 
+    posKey = history[hisPly].posKey;
+
+    assert(check_board());
+}
+
+void Board::take_move_null() {
+    assert(check_board());
+
+    hisPly--;
+    ply--;
+
+    castlePerm = history[hisPly].castlePerm;
+    fiftyMove = history[hisPly].fiftyMove;
+    enPas = history[hisPly].enPas;
+
+    side ^= 1;
     posKey = history[hisPly].posKey;
 
     assert(check_board());

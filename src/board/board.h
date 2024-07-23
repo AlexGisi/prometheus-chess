@@ -36,6 +36,9 @@ public:
 
     [[nodiscard]] bool check_board() const;
     [[nodiscard]] bool sq_attacked(int sq, int att_side) const;
+    [[nodiscard]] inline bool king_in_check() const {
+        return sq_attacked(kingSq[side], side^1);
+    }
     void print_squares_attacked(int side) const;
 
     static std::string sq_to_str(int sq);
@@ -56,9 +59,9 @@ public:
     PosKey posKey;
 
     int pceNum[13];  // Number of pieces of each type.
-    int bigPce[2];  // Number of 'big pieces', i.e. not pawns.
-    int majPce[2];  // Number of 'major pieces', i.e. rooks and queens.
-    int minPce[2];  // Number of 'minor pieces', bishops and knights.
+    int bigPce[2];  // Number of 'big pieces', i.e. not pawns (but including kings).
+    int majPce[2];  // Number of 'major pieces', i.e. rooks, queens, kings.
+    int minPce[2];  // Number of 'minor pieces', i.e. bishops, knights.
     int material[2];  // Sum of material values for white and black's pieces.
 
     int castlePerm;  // All castle permissions represented by four bits.
@@ -102,6 +105,8 @@ public:
     void move_piece(int from, int to);
     bool make_move(Move& move);
     void take_move();
+    void make_move_null();
+    void take_move_null();
 
     // Perft.
     uint64_t perft(int depth);

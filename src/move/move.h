@@ -30,6 +30,9 @@ public:
     [[nodiscard]] bool castle() const;
     [[nodiscard]] bool capture() const;
     [[nodiscard]] bool promotion() const;
+    [[nodiscard]] inline bool is_no_move() const {
+        return move == 0;
+    }
 
     [[nodiscard]] std::string to_str() const;
     static Move from_str(const std::string & move_str, Board & board);

@@ -144,7 +144,7 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     return alpha;
 }
 
-inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInfo& info, int doNull) {
+inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInfo& info, int do_null) {
     assert(board.check_board());
 
     if(depth == 0) {
@@ -162,6 +162,25 @@ inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInf
     if(board.ply > MAX_DEPTH - 1)
         return eval(board);
 
+    int score = -INFINITE;
+
+    // Explanation of null moves:
+    // https://web.archive.org/web/20071031095933/http://www.brucemo.com:80/compchess/programming/nullmove.htm
+    // board.ply: must have made at least one move to perform a null move.
+    // board.bigPce[board.side] > 2: check if any pieces (besides kings) still on
+    // the board. This is a crude endgame detector so that null move is not performed in a late endgame position.
+    // depth >= 4: since using R of 3, depth must be at least 4.
+    if (do_null && !board.king_in_check() && board.ply && board.bigPce[board.side] > 2 && depth >= 4) {
+        board.make_move_null();
+        score = -alphaBeta(-beta, -beta + 1, depth-4, board, info, false);
+        board.take_move_null();
+        if (info.stopped) {
+            return 0;
+        } else if (score >= beta) {
+            return beta;
+        }
+    }
+
     std::optional<SearchMove> hash_move = board.pvTable.probe_move(board.posKey, alpha, beta, depth);
     if (hash_move) {
         return hash_move.value().score;
@@ -174,7 +193,7 @@ inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInf
     int old_alpha = alpha;
     SearchMove best_move = SearchMove(Move(), -INFINITE);
     SearchMove current_move;
-    int score = -INFINITE;
+    score = -INFINITE;
     std::optional<PVTable::PVEntry> pv_entry = board.pvTable.probe(board.posKey);
 
     // Ensure we search the PV line first.
