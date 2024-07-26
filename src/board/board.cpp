@@ -888,7 +888,7 @@ void Board::take_move_null() {
 /*
  * Ref: https://www.chessprogramming.org/Perft#Perft_function
  */
-u64 Board::perft(int depth) {
+uint64_t Board::perft(int depth) {
     if (depth == 0)
         return 1ULL;
 
