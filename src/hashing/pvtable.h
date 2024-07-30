@@ -23,7 +23,7 @@ public:
         PVEntry() : age(0), flag(EntryFlag::HFNONE) {};
         PVEntry(const PosKey& key,
                 const SearchMove &m,
-                uint8_t p_depth,
+                int p_depth,
                 EntryFlag p_flag) {
             posKey = key;
             move = m;
@@ -35,8 +35,8 @@ public:
 
         PosKey posKey;
         SearchMove move;
-        uint8_t depth = 0;
-        uint8_t age;
+        int depth = 0;
+        int age;
         EntryFlag flag = EntryFlag::HFNONE;
         bool full = false;
     };
@@ -66,7 +66,7 @@ private:
     uint64_t overwrite = 0;
     uint64_t hit = 0;
     uint64_t cut = 0;
-    uint8_t current_age = 0;
+    int current_age = 0;
 };
 
 

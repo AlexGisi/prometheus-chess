@@ -69,7 +69,7 @@ public:
     static Move from_str(const std::string & move_str, Board & board);
 
 private:
-    uint32_t move;
+    int move;
 };
 
 class SearchMove {

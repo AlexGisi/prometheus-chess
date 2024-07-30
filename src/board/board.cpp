@@ -952,7 +952,7 @@ bool Board::perft_eval_pos(int depth, const std::string& fen, const uint64_t* co
 /*
  * Update the pvArray variable based on the content of the pvTable.
  */
-int Board::update_pv_line(const uint8_t depth) {
+int Board::update_pv_line(const int depth) {
     assert(depth < MAX_DEPTH);
 
     std::optional<PVTable::PVEntry> mv_opt = pvTable.probe(posKey);

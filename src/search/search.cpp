@@ -12,7 +12,7 @@
 typedef struct {
     uint64_t start_time;
     uint64_t stop_time;
-    uint8_t depth;
+    int depth;
     int depth_set;
     int time_set;
     int moves_to_go;
@@ -144,7 +144,7 @@ inline int quiescence(int alpha, int beta, Board& board, SearchInfo &info) {
     return alpha;
 }
 
-inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInfo& info, int do_null) {
+inline int alphaBeta(int alpha, int beta, int depth, Board& board, SearchInfo& info, int do_null) {
     assert(board.check_board());
 
     if(depth == 0) {
@@ -273,7 +273,7 @@ inline int alphaBeta(int alpha, int beta, uint8_t depth, Board& board, SearchInf
 inline void search(Board& board, SearchInfo& info) {
     Move best_move;
     int best_score = -INFINITE;
-    uint8_t current_depth = 0;
+    int current_depth = 0;
     int pv_moves = 0;
     int pv_num = 0;
 

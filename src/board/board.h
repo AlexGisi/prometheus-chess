@@ -114,7 +114,7 @@ public:
     bool perft_eval_pos(int depth, const std::string& fen, const uint64_t* correct);
 
     // Principal variation.
-    int update_pv_line(uint8_t depth);
+    int update_pv_line(int depth);
 
     // Board status.
     [[nodiscard]] bool is_repetition() const;
