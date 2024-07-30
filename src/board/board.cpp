@@ -526,20 +526,20 @@ void Board::print_squares_attacked(int att_side) const {
     int file = 0;
     int sq = 0;
 
-    printf("\n\nSquares attacked by:%c\n", sideChar[att_side]);
+    std::cout << "Squares attacked by " << sideChar[att_side] << std::endl;
     for(rank = RANK_8; rank >= RANK_1; --rank) {
         for(file = FILE_A; file <= FILE_H; ++file) {
             sq = FR2SQ(file,rank);
             if(sq_attacked(sq, att_side)) {
-                printf("X");
+                std::cout << 'X';
             } else {
-                printf("-");
+                std::cout << '-';
             }
 
         }
-        printf("\n");
+        std::cout << std::endl;
     }
-    printf("\n\n");
+    std::cout << std::endl << std::endl;
 }
 
 std::string Board::sq_to_str(const int sq) {

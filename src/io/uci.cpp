@@ -115,8 +115,7 @@ void uci_parse_go(Board &board, std::istringstream is, SearchInfo &info) {
 
     info.depth = (depth == -1) ? MAX_DEPTH : depth;
 
-    printf("info string time:%d start:%lu stop:%lu depth:%d timeset:%d",
-           time,info.start_time,info.stop_time,info.depth,info.time_set);
+    std::cout << "info string time:" << time << " start:" << info.start_time << " stop:" << info.stop_time << " depth:" << info.depth << " timeset:" << info.time_set;
     std::cout << std::endl;
 
     std::thread (search, std::ref(board), std::ref(info)).detach();

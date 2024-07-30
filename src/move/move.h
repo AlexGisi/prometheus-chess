@@ -26,7 +26,7 @@ class Board;
 class Move {
 public:
     Move();
-    explicit Move(uint32_t m);
+    explicit Move(int m);
     Move(int from, int to, int cap, int pro, int f1);
 
     Move(const Move& rhs);

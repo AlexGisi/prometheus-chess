@@ -12,12 +12,12 @@ Move::Move() {
     move = 0;
 }
 
-Move::Move(uint32_t m) {
+Move::Move(int m) {
     move = m;
 }
 
 Move::Move(int from, int to, int cap, int pro, int f1) {
-    move = static_cast<uint32_t>(from | (to << 7) | (cap << 14) | (pro << 20 | f1));
+    move = from | (to << 7) | (cap << 14) | (pro << 20 | f1);
 }
 
 Move Move::from_str(const std::string &move_str, Board &board) {
