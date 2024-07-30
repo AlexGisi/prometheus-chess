@@ -33,6 +33,10 @@ public:
     Move& operator=(const Move& rhs);
     bool operator==(const Move& rhs) const;
 
+    [[nodiscard]] inline bool is_no_move() const {
+	    return move == 0;
+    }
+
     [[nodiscard]] inline int from() const {
         return move & 0x7F;
     }
@@ -63,6 +67,10 @@ public:
 
     [[nodiscard]] inline bool capture() const {
         return move & 0x7C000;
+    }
+
+    [[nodiscard]] int to_int() const {
+	    return move;
     }
 
     [[nodiscard]] std::string to_str() const;

@@ -291,7 +291,7 @@ inline void search(Board& board, SearchInfo& info) {
         if(info.stopped)
             break;
 
-        printf("info score cp %d depth %d nodes %llu time %llu ",
+        printf("info score cp %d depth %d nodes %lu time %lu ",
                best_score, current_depth, info.nodes, get_time()-info.start_time);
         printf("pv");
         for(pv_num = 0; pv_num < pv_moves; pv_num++) {

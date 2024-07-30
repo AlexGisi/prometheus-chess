@@ -56,3 +56,7 @@ else()
 endif()
 
 target_include_directories(prometheus PUBLIC)
+
+find_package(Threads REQUIRED)
+target_link_libraries(prometheus PRIVATE Threads::Threads)
+

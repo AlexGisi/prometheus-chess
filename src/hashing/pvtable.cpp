@@ -61,9 +61,9 @@ PVTable& PVTable::operator=(const PVTable &rhs) {
  */
 void PVTable::store(const PosKey& key, PVEntry value) {
     uint64_t idx = hash(key);
-    assert(idx >= 0 && idx <= entries-1);
+    assert(idx <= entries-1);
     assert(value.full == true);
-    assert(value.move.move.move != 0);
+    assert(value.move.move.to_int() != 0);
 
     bool do_store = false;
     if (table[idx].full) {
@@ -89,7 +89,7 @@ void PVTable::store(const PosKey& key, PVEntry value) {
  */
 std::optional<PVTable::PVEntry> PVTable::probe(const PosKey &key) {
     uint64_t idx = hash(key);
-    assert(idx >= 0 && idx <= entries-1);
+    assert(idx <= entries-1);
 
     if (table[idx].full && table[idx].posKey == key)
         return table[idx];
@@ -113,7 +113,7 @@ std::optional<SearchMove> PVTable::probe_move(const PosKey& key, int alpha, int 
     int score;
     uint64_t idx = hash(key);
 
-    assert(idx >= 0 && idx <= entries-1);
+    assert(idx <= entries-1);
     assert(depth >= 1 && depth <= MAX_DEPTH);
     assert(alpha < beta);
     assert(alpha >= -INFINITE && alpha <= INFINITE);
