@@ -33,3 +33,7 @@ Elo difference: -368.59 +/- 30.57, LOS: 0.00 %, DrawRatio: 9.20 %
 Score of prometheus_new vs vice: 86 - 819 - 95 [0.134] 1000
 Elo difference: -324.91 +/- 28.38, LOS: 0.00 %, DrawRatio: 9.50 %
 
+4b797d3fbf29c61c2d20e18dd033968a1a685e7a
+Score of prometheus_new vs vice: 81 - 803 - 116 [0.139] 1000
+Elo difference: -316.80 +/- 27.23, LOS: 0.00 %, DrawRatio: 11.60 %
+

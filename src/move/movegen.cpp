@@ -389,8 +389,8 @@ void MoveGen::add_white_pawn_move(int from, int to, const MoveListPtr& list) {
 }
 
 void MoveGen::add_black_pawn_move(int from, int to, const MoveListPtr& list) {
-    assert(Board::is_on_board);
-    assert(Board::is_on_board);
+    assert(Board::is_on_board(from));
+    assert(Board::is_on_board(to));
 
     if(Board::ranksBrd[from] == RANK_2) {
         add_quiet_move(Move(from, to, EMPTY, bQ, 0), list);

@@ -15,7 +15,7 @@
 
 Board::Board() {
     initialize();
-};
+}
 
 void Board::initialize() {
     for(int & piece : pieces)
@@ -230,7 +230,7 @@ Board::Board(const Board &rhs) {
 
     posKey = rhs.posKey;
     pvTable = rhs.pvTable;
-};
+}
 
 Board &Board::operator=(const Board &rhs) {
     // This self-assignment check is considered bad design.

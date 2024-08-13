@@ -32,7 +32,7 @@ current_datetime=$(date +"%Y-%m-%d_%H-%M-%S")
   -rounds 1 \
   -games 1000 \
   -log file=log.txt level=fatal compress=false \
-  -concurrency 8
+  -concurrency 7
 
 rm config.json
 rm log.txt
