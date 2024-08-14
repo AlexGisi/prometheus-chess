@@ -4,7 +4,7 @@
 > transparent meaning. It is a regularly-formed Greek word, and
 > means Forethinker (or perhaps Forethought in the abstract). (Guthrie, 1986)
 
-Promestheus is a conventional chess engine. 
+Prometheus is a conventional chess engine. 
 
 # Build
 You can build prometheus on your machine using cmake. From the repo's root directory:
