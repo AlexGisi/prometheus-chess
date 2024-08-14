@@ -41,8 +41,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clan
             -Wconversion
             -Wshadow
             -Wcast-qual
-            -flto
             )
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        target_compile_options(prometheus PRIVATE -flto)
+        target_link_libraries(prometheus PRIVATE -flto)
+    endif()
+
     message(STATUS "Using GCC or Clang compiler")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
