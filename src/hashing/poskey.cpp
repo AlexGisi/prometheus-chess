@@ -76,10 +76,13 @@ PosKey::PosKey(const PosKey &rhs) {
 }
 
 void PosKey::hash_piece(const int pce, const int sq) {
+    assert(pce != NO_SQ && pce != EMPTY && pce != OFFBOARD);
+    assert(pce >= wP && pce <= bK);
     val ^= pieceKeys[pce][sq];
 }
 
 void PosKey::hash_castle(int castlePerm) {
+    assert(castlePerm >= 0 && castlePerm <= 15);
     val ^= castleKeys[castlePerm];
 }
 
@@ -88,6 +91,7 @@ void PosKey::hash_side() {
 }
 
 void PosKey::hash_ep(int enPas) {
+    assert(enPas >= 0 && enPas < BRD_SQ_NUM);
     val ^= pieceKeys[EMPTY][enPas];
 }
 

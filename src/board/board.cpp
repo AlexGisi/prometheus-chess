@@ -676,6 +676,7 @@ bool Board::make_move(const Move& move) {
     int from = move.from();
     int to = move.to();
 
+    assert(!move.is_no_move());
     assert(is_on_board(from));
     assert(is_on_board(to));
     assert(sideValid(side));
