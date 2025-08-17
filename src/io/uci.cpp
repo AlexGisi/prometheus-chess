@@ -149,7 +149,11 @@ void uci_parse_setoption(Board &board, std::istringstream is) {
     is >> token;  // Skip "name".
     is >> token;
     if (token == "Hash") {
-        is >> token;  // Hash size in MB.
+        is >> token;  // Should read "value"
+        if (token == "value") {
+            is >> token;  // Fix by @tissatussa
+        }
+
         board.resize_pv_table(std::stoul(token) * 0x100000);
     }
 }
