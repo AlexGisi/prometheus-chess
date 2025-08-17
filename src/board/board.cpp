@@ -787,7 +787,6 @@ void Board::make_move_null() {
 
     // todo: understand where enPas is set.
     if(enPas != NO_SQ) posKey.hash_ep(enPas);
-    posKey.hash_castle(castlePerm);
 
     history[hisPly].move = move;
     history[hisPly].fiftyMove = fiftyMove;
