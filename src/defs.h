@@ -9,7 +9,7 @@
 
 #define NAME "prometheus"
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "2"
+#define VERSION_MINOR "2.1"
 #define AUTHOR "Alex Gisi"
 
 typedef unsigned long long u64;
